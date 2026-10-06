@@ -3,6 +3,8 @@ export const SITE_METADATA = {
   tagline: 'Learn better. With the right tutor.',
   city: 'Delhi',
   supportEmail: 'hello@spectretutors.in',
+  coordinatorWhatsApp: '919220638540',
+  displayPhone: '+91 92206 38540',
   targetClasses: 'Classes 6–12',
   subjectsCovered: 'Mathematics, Science, English',
 };

@@ -8,7 +8,7 @@ export function getSpectreWhatsAppNumber(): string {
   const rawNumber =
     import.meta.env.VITE_SPECTRE_WHATSAPP_NUMBER ||
     import.meta.env.VITE_COORDINATOR_WHATSAPP ||
-    '919876543210';
+    '919220638540';
   return rawNumber.replace(/\D/g, '');
 }
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, MapPin } from 'lucide-react';
+import { Mail, MapPin, MessageSquare } from 'lucide-react';
 import { SITE_METADATA } from '../data/content';
 
 export const Footer: React.FC = () => {
@@ -28,6 +28,17 @@ export const Footer: React.FC = () => {
               <div className="flex items-center space-x-2">
                 <MapPin className="w-4 h-4 text-trust" />
                 <span>Delhi, India</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <MessageSquare className="w-4 h-4 text-[#25D366]" />
+                <a 
+                  href={`https://wa.me/${SITE_METADATA.coordinatorWhatsApp}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors"
+                >
+                  WhatsApp: {SITE_METADATA.displayPhone}
+                </a>
               </div>
               <div className="flex items-center space-x-2">
                 <Mail className="w-4 h-4 text-trust" />
