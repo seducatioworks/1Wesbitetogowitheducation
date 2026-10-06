@@ -8,9 +8,16 @@ import {
   Download,
   Filter,
   Eye,
-  X
+  X,
+  MessageSquare,
+  Copy,
+  Check
 } from 'lucide-react';
 import { getTutorRequests, updateRequestStatus, isSupabaseConfigured } from '../lib/supabase';
+import { 
+  getAdminReplyWhatsAppUrl, 
+  formatRequestAsWhatsAppTextForm 
+} from '../lib/notifications';
 import type { TutorRequest } from '../types';
 
 export const Admin: React.FC = () => {
@@ -18,6 +25,7 @@ export const Admin: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<'all' | 'new' | 'contacted' | 'matched' | 'closed'>('all');
   const [selectedRequest, setSelectedRequest] = useState<TutorRequest | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const fetchRequests = async () => {
     setLoading(true);
@@ -45,6 +53,13 @@ export const Admin: React.FC = () => {
     }
   };
 
+  const handleCopyTextForm = (req: TutorRequest) => {
+    const text = formatRequestAsWhatsAppTextForm(req);
+    navigator.clipboard.writeText(text);
+    setCopiedId(req.id || 'current');
+    setTimeout(() => setCopiedId(null), 2500);
+  };
+
   const filteredRequests = requests.filter((r) => {
     if (statusFilter === 'all') return true;
     return r.status === statusFilter;
@@ -56,7 +71,8 @@ export const Admin: React.FC = () => {
     const headers = [
       'ID',
       'Date',
-      'Parent Name',
+      'Role',
+      'Name',
       'Phone',
       'Email',
       'Class',
@@ -75,6 +91,7 @@ export const Admin: React.FC = () => {
     const rows = requests.map((r) => [
       r.id || '',
       r.created_at ? new Date(r.created_at).toLocaleDateString() : '',
+      r.user_type || 'parent',
       `"${r.parent_name}"`,
       r.phone,
       r.email || '',
@@ -124,7 +141,7 @@ export const Admin: React.FC = () => {
               </span>
             </div>
             <p className="text-xs sm:text-sm text-ink-muted mt-1">
-              Review incoming home tutoring requests from parents in Delhi.
+              Review incoming home tutoring requests and tutor registrations from Delhi.
             </p>
           </div>
 
@@ -180,11 +197,11 @@ export const Admin: React.FC = () => {
           {loading ? (
             <div className="p-12 text-center text-sm text-ink-muted">
               <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-trust" />
-              Loading tutor requests...
+              Loading requests...
             </div>
           ) : filteredRequests.length === 0 ? (
             <div className="p-12 text-center text-sm text-ink-muted">
-              No tutor requests found matching the current filter.
+              No requests found matching the current filter.
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -192,14 +209,14 @@ export const Admin: React.FC = () => {
                 <thead className="bg-slate-50 border-b border-border-subtle text-ink-muted font-heading uppercase tracking-wider text-[11px]">
                   <tr>
                     <th className="py-3 px-4">Date</th>
-                    <th className="py-3 px-4">Parent</th>
-                    <th className="py-3 px-4">Contact</th>
-                    <th className="py-3 px-4">Class & Board</th>
+                    <th className="py-3 px-4">Type</th>
+                    <th className="py-3 px-4">Name</th>
+                    <th className="py-3 px-4">Phone</th>
+                    <th className="py-3 px-4">Class</th>
                     <th className="py-3 px-4">Subjects</th>
                     <th className="py-3 px-4">Area in Delhi</th>
-                    <th className="py-3 px-4">Timing</th>
                     <th className="py-3 px-4">Status</th>
-                    <th className="py-3 px-4 text-right">Actions</th>
+                    <th className="py-3 px-4 text-right">Quick Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border-subtle">
@@ -215,7 +232,20 @@ export const Admin: React.FC = () => {
                           : 'Recent'}
                       </td>
 
-                      {/* Parent */}
+                      {/* Type Badge */}
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold ${
+                            req.user_type === 'tutor'
+                              ? 'bg-purple-100 text-purple-800'
+                              : 'bg-blue-100 text-blue-800'
+                          }`}
+                        >
+                          {req.user_type === 'tutor' ? '🧑‍🏫 Tutor' : '👨‍👩‍👧 Parent'}
+                        </span>
+                      </td>
+
+                      {/* Name */}
                       <td className="py-3 px-4 whitespace-nowrap font-medium text-navy">
                         {req.parent_name}
                       </td>
@@ -241,7 +271,7 @@ export const Admin: React.FC = () => {
 
                       {/* Subjects */}
                       <td className="py-3 px-4 text-ink">
-                        <div className="flex flex-wrap gap-1 max-w-[200px]">
+                        <div className="flex flex-wrap gap-1 max-w-[180px]">
                           {req.subjects.map((sub) => (
                             <span
                               key={sub}
@@ -259,14 +289,6 @@ export const Admin: React.FC = () => {
                           <MapPin className="w-3 h-3 text-trust shrink-0" />
                           <span>{req.area}</span>
                         </div>
-                      </td>
-
-                      {/* Timing */}
-                      <td className="py-3 px-4 whitespace-nowrap text-xs text-ink-muted">
-                        <div>{req.preferred_time}</div>
-                        {req.frequency && (
-                          <div className="text-[11px] text-slate-400">{req.frequency}</div>
-                        )}
                       </td>
 
                       {/* Status */}
@@ -289,7 +311,17 @@ export const Admin: React.FC = () => {
                       </td>
 
                       {/* Actions */}
-                      <td className="py-3 px-4 whitespace-nowrap text-right">
+                      <td className="py-3 px-4 whitespace-nowrap text-right space-x-2">
+                        <a
+                          href={getAdminReplyWhatsAppUrl(req)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#25D366]/10 text-[#1b8a43] hover:bg-[#25D366]/20 font-semibold text-xs transition-colors"
+                          title="Open WhatsApp Chat"
+                        >
+                          <MessageSquare className="w-3.5 h-3.5" />
+                          <span>WhatsApp</span>
+                        </a>
                         <button
                           type="button"
                           onClick={() => setSelectedRequest(req)}
@@ -307,7 +339,7 @@ export const Admin: React.FC = () => {
           )}
         </div>
 
-        {/* Modal for Full Request Details */}
+        {/* Modal for Full Request Details & WhatsApp Text Form */}
         {selectedRequest && (
           <div
             className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4"
@@ -320,9 +352,14 @@ export const Admin: React.FC = () => {
               <div className="flex items-start justify-between border-b border-border-subtle pb-4">
                 <div>
                   <span className="text-xs font-mono text-ink-muted">{selectedRequest.id}</span>
-                  <h3 className="font-heading font-bold text-xl text-navy">
-                    {selectedRequest.parent_name}
-                  </h3>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <h3 className="font-heading font-bold text-xl text-navy">
+                      {selectedRequest.parent_name}
+                    </h3>
+                    <span className="text-xs px-2 py-0.5 rounded font-semibold bg-slate-100 text-slate-800">
+                      {selectedRequest.user_type === 'tutor' ? 'Tutor' : 'Parent'}
+                    </span>
+                  </div>
                 </div>
                 <button
                   type="button"
@@ -333,8 +370,39 @@ export const Admin: React.FC = () => {
                 </button>
               </div>
 
-              <div className="space-y-3 text-xs sm:text-sm">
-                <div className="grid grid-cols-2 gap-2 pb-3 border-b border-slate-100">
+              {/* Quick WhatsApp outreach button */}
+              <div className="flex flex-wrap gap-2 pt-1 pb-3 border-b border-slate-100">
+                <a
+                  href={getAdminReplyWhatsAppUrl(selectedRequest)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold transition-all shadow-xs"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  <span>Chat on WhatsApp</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={() => handleCopyTextForm(selectedRequest)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md bg-slate-100 hover:bg-slate-200 text-navy text-xs font-semibold transition-colors"
+                >
+                  {copiedId ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                  <span>{copiedId ? 'Copied Text Form!' : 'Copy WhatsApp Form Text'}</span>
+                </button>
+              </div>
+
+              {/* WhatsApp Text Form Preview Box */}
+              <div>
+                <label className="text-xs font-semibold uppercase tracking-wider text-ink-muted block mb-1">
+                  WhatsApp Text Form (Ready to Forward):
+                </label>
+                <pre className="p-3 bg-slate-50 rounded border border-border-subtle text-[11px] font-mono text-slate-800 whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto">
+                  {formatRequestAsWhatsAppTextForm(selectedRequest)}
+                </pre>
+              </div>
+
+              <div className="space-y-3 text-xs sm:text-sm pt-2">
+                <div className="grid grid-cols-2 gap-2 pb-2 border-b border-slate-100">
                   <div>
                     <span className="text-ink-muted block text-xs">Phone:</span>
                     <a
@@ -350,7 +418,7 @@ export const Admin: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 pb-3 border-b border-slate-100">
+                <div className="grid grid-cols-2 gap-2 pb-2 border-b border-slate-100">
                   <div>
                     <span className="text-ink-muted block text-xs">Class:</span>
                     <span className="font-semibold text-navy">{selectedRequest.student_class}</span>
@@ -361,7 +429,7 @@ export const Admin: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="pb-3 border-b border-slate-100">
+                <div className="pb-2 border-b border-slate-100">
                   <span className="text-ink-muted block text-xs mb-1">Subjects:</span>
                   <div className="flex flex-wrap gap-1.5">
                     {selectedRequest.subjects.map((s) => (
@@ -372,8 +440,8 @@ export const Admin: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="pb-3 border-b border-slate-100">
-                  <span className="text-ink-muted block text-xs mb-1">Help Needed:</span>
+                <div className="pb-2 border-b border-slate-100">
+                  <span className="text-ink-muted block text-xs mb-1">Help Needed / Focus:</span>
                   <div className="flex flex-wrap gap-1.5">
                     {selectedRequest.help_needed.map((h) => (
                       <span key={h} className="px-2 py-0.5 rounded bg-trust-light text-xs font-medium text-trust">
@@ -383,9 +451,9 @@ export const Admin: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 pb-3 border-b border-slate-100">
+                <div className="grid grid-cols-2 gap-2 pb-2 border-b border-slate-100">
                   <div>
-                    <span className="text-ink-muted block text-xs">Locality in Delhi:</span>
+                    <span className="text-ink-muted block text-xs">Area in Delhi:</span>
                     <span className="font-semibold text-navy">{selectedRequest.area}</span>
                   </div>
                   <div>
@@ -394,13 +462,13 @@ export const Admin: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 pb-3 border-b border-slate-100">
+                <div className="grid grid-cols-2 gap-2 pb-2 border-b border-slate-100">
                   <div>
                     <span className="text-ink-muted block text-xs">Preferred Days:</span>
                     <span className="font-medium text-navy">{selectedRequest.preferred_days.join(', ')}</span>
                   </div>
                   <div>
-                    <span className="text-ink-muted block text-xs">Time & Frequency:</span>
+                    <span className="text-ink-muted block text-xs">Timing & Frequency:</span>
                     <span className="font-medium text-navy">
                       {selectedRequest.preferred_time} ({selectedRequest.frequency || 'Flexible'})
                     </span>
@@ -408,9 +476,9 @@ export const Admin: React.FC = () => {
                 </div>
 
                 {selectedRequest.additional_message && (
-                  <div className="pb-3 border-b border-slate-100">
-                    <span className="text-ink-muted block text-xs mb-1">Parent's Message:</span>
-                    <p className="p-3 bg-slate-50 rounded text-ink text-xs leading-relaxed italic">
+                  <div className="pb-2 border-b border-slate-100">
+                    <span className="text-ink-muted block text-xs mb-1">Message / Notes:</span>
+                    <p className="p-2.5 bg-slate-50 rounded text-ink text-xs leading-relaxed italic">
                       "{selectedRequest.additional_message}"
                     </p>
                   </div>

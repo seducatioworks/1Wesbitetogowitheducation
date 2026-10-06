@@ -1,10 +1,11 @@
 export interface TutorRequest {
   id?: string;
   created_at?: string;
-  parent_name: string;
+  user_type?: 'parent' | 'tutor';
+  parent_name: string; // Used for Parent Name or Tutor Name
   phone: string;
   email?: string;
-  student_class: string;
+  student_class: string; // Student Class or Classes taught
   board?: string;
   subjects: string[];
   help_needed: string[];

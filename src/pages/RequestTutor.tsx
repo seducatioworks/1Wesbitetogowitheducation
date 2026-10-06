@@ -78,6 +78,7 @@ export const RequestTutor: React.FC = () => {
 
   // Form data state
   const [formData, setFormData] = useState<Omit<TutorRequest, 'id' | 'created_at' | 'status'>>({
+    user_type: 'parent',
     parent_name: '',
     phone: '',
     email: '',
@@ -96,6 +97,8 @@ export const RequestTutor: React.FC = () => {
   const [validationError, setValidationError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const isTutor = formData.user_type === 'tutor';
+
   // Handle preselected values from navigation state
   useEffect(() => {
     if (location.state && (location.state as any).preselectedHelp) {
@@ -113,7 +116,7 @@ export const RequestTutor: React.FC = () => {
 
     if (step === 1) {
       if (!formData.student_class) {
-        setValidationError("Please select the student's current class.");
+        setValidationError(isTutor ? "Please select the class level you teach." : "Please select the student's current class.");
         return false;
       }
       return true;
@@ -125,7 +128,7 @@ export const RequestTutor: React.FC = () => {
         return false;
       }
       if (formData.help_needed.length === 0) {
-        setValidationError('Please select what kind of help your child needs.');
+        setValidationError(isTutor ? 'Please select your areas of teaching focus.' : 'Please select what kind of help your child needs.');
         return false;
       }
       return true;
@@ -133,7 +136,7 @@ export const RequestTutor: React.FC = () => {
 
     if (step === 3) {
       if (!formData.area.trim()) {
-        setValidationError('Please specify your area or locality in Delhi (e.g. Preet Vihar, Rohini, Saket).');
+        setValidationError('Please specify your locality in Delhi (e.g. Preet Vihar, Rohini, Saket).');
         return false;
       }
       return true;
@@ -141,7 +144,7 @@ export const RequestTutor: React.FC = () => {
 
     if (step === 4) {
       if (formData.preferred_days.length === 0) {
-        setValidationError('Please select at least one preferred day for home tuition.');
+        setValidationError('Please select at least one preferred day.');
         return false;
       }
       if (!formData.preferred_time) {
@@ -153,7 +156,7 @@ export const RequestTutor: React.FC = () => {
 
     if (step === 5) {
       if (!formData.parent_name.trim()) {
-        setValidationError('Please provide your name as the parent or guardian.');
+        setValidationError(isTutor ? 'Please provide your full name as the tutor.' : 'Please provide your name as the parent or guardian.');
         return false;
       }
       const cleanPhone = formData.phone.replace(/[\s-]/g, '');
@@ -212,12 +215,10 @@ export const RequestTutor: React.FC = () => {
       if (result.success) {
         navigate('/request-success', {
           state: {
-            requestDetails: {
-              parentName: formData.parent_name,
-              studentClass: formData.student_class,
-              subjects: formData.subjects,
-              area: formData.area,
-              phone: formData.phone,
+            request: result.data || {
+              ...formData,
+              id: `req-${Date.now().toString(36)}`,
+              created_at: new Date().toISOString(),
             },
           },
         });
@@ -232,7 +233,7 @@ export const RequestTutor: React.FC = () => {
   };
 
   const stepLabels = [
-    { num: 1, label: 'Student' },
+    { num: 1, label: isTutor ? 'Level' : 'Student' },
     { num: 2, label: 'Subject' },
     { num: 3, label: 'Location' },
     { num: 4, label: 'Schedule' },
@@ -257,16 +258,44 @@ export const RequestTutor: React.FC = () => {
         {/* Form Container */}
         <div className="bg-white rounded-lg border border-border-subtle shadow-sm p-6 sm:p-8">
           
+          {/* Role Switcher (Parent or Tutor) */}
+          <div className="flex bg-slate-100 p-1 rounded-md mb-6 border border-border-subtle">
+            <button
+              type="button"
+              onClick={() => setFormData({ ...formData, user_type: 'parent' })}
+              className={`flex-1 py-2 px-3 text-xs font-semibold rounded transition-all ${
+                !isTutor
+                  ? 'bg-white text-navy shadow-xs border border-border-subtle'
+                  : 'text-ink-muted hover:text-navy'
+              }`}
+            >
+              👨‍👩‍👧 Parent / Guardian (Request a Tutor)
+            </button>
+            <button
+              type="button"
+              onClick={() => setFormData({ ...formData, user_type: 'tutor' })}
+              className={`flex-1 py-2 px-3 text-xs font-semibold rounded transition-all ${
+                isTutor
+                  ? 'bg-white text-navy shadow-xs border border-border-subtle'
+                  : 'text-ink-muted hover:text-navy'
+              }`}
+            >
+              🧑‍🏫 Tutor / Educator (Join Network)
+            </button>
+          </div>
+
           {/* Header */}
           <div className="border-b border-border-subtle pb-6 mb-6">
             <span className="text-xs font-semibold uppercase tracking-wider text-trust">
-              Step {currentStep} of 5
+              Step {currentStep} of 5 &middot; {isTutor ? 'Tutor Registration' : 'Parent Request'}
             </span>
             <h1 className="font-heading font-bold text-2xl sm:text-3xl text-navy mt-1 tracking-tight">
-              Request a Home Tutor
+              {isTutor ? 'Join as a Home Tutor' : 'Request a Home Tutor'}
             </h1>
             <p className="text-xs sm:text-sm text-ink-muted mt-1">
-              Tell us about your requirements. A member of the Spectre team will review them and contact you.
+              {isTutor
+                ? 'Share your teaching subjects, classes, and Delhi location preferences. We will connect with you.'
+                : 'Tell us about your requirements. A member of the Spectre team will review them and contact you.'}
             </p>
 
             {/* Stepper Progress Bar */}
@@ -308,22 +337,24 @@ export const RequestTutor: React.FC = () => {
           )}
 
           <form onSubmit={handleSubmit}>
-            {/* STEP 1: STUDENT */}
+            {/* STEP 1: STUDENT / TUTOR LEVEL */}
             {currentStep === 1 && (
               <div className="space-y-6">
                 <div>
                   <h2 className="font-heading font-bold text-lg sm:text-xl text-navy">
-                    Tell us about the student.
+                    {isTutor ? 'Tell us about the classes you teach.' : 'Tell us about the student.'}
                   </h2>
                   <p className="text-xs sm:text-sm text-ink-muted mt-1">
-                    Select the class your child is currently enrolled in.
+                    {isTutor
+                      ? 'Select the primary class level you specialize in.'
+                      : 'Select the class your child is currently enrolled in.'}
                   </p>
                 </div>
 
                 {/* Class selector */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-3">
-                    Student's Class <span className="text-red-500">*</span>
+                    {isTutor ? 'Target Class Level' : "Student's Class"} <span className="text-red-500">*</span>
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                     {CLASS_OPTIONS.map((cls) => {
@@ -379,17 +410,19 @@ export const RequestTutor: React.FC = () => {
               <div className="space-y-6">
                 <div>
                   <h2 className="font-heading font-bold text-lg sm:text-xl text-navy">
-                    What does your child need help with?
+                    {isTutor ? 'What subjects & expertise do you teach?' : 'What does your child need help with?'}
                   </h2>
                   <p className="text-xs sm:text-sm text-ink-muted mt-1">
-                    Select one or more subjects for home tutoring.
+                    {isTutor
+                      ? 'Select the subjects you offer for 1-on-1 home tuition in Delhi.'
+                      : 'Select one or more subjects for home tutoring.'}
                   </p>
                 </div>
 
                 {/* Subjects */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-3">
-                    Subjects Needed <span className="text-red-500">*</span> (Select all that apply)
+                    {isTutor ? 'Subjects You Teach' : 'Subjects Needed'} <span className="text-red-500">*</span> (Select all that apply)
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {SUBJECT_OPTIONS.map((sub) => {
@@ -413,10 +446,10 @@ export const RequestTutor: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Help needed */}
+                {/* Help needed / Teaching Focus */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-3">
-                    What kind of help do they need? <span className="text-red-500">*</span>
+                    {isTutor ? 'Teaching Focus & Strengths' : 'What kind of help do they need?'} <span className="text-red-500">*</span>
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     {HELP_OPTIONS.map((opt) => {
@@ -440,15 +473,19 @@ export const RequestTutor: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Tell us a little more */}
+                {/* Additional details */}
                 <div>
                   <label htmlFor="topic-details" className="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-2">
-                    Tell us a little more (Optional)
+                    {isTutor ? 'Qualifications & Teaching Experience (Optional)' : 'Tell us a little more (Optional)'}
                   </label>
                   <textarea
                     id="topic-details"
                     rows={3}
-                    placeholder="e.g. Struggling with quadratic equations, or needs help preparing for term exams..."
+                    placeholder={
+                      isTutor
+                        ? 'e.g. M.Sc. Physics with 4 years experience teaching CBSE Class 10 & 12 students...'
+                        : 'e.g. Struggling with quadratic equations, or needs help preparing for term exams...'
+                    }
                     value={formData.additional_message}
                     onChange={(e) => setFormData({ ...formData, additional_message: e.target.value })}
                     className="w-full text-sm p-3 rounded-md border border-border-subtle focus:outline-none focus:ring-2 focus:ring-navy focus:border-navy"
@@ -462,7 +499,7 @@ export const RequestTutor: React.FC = () => {
               <div className="space-y-6">
                 <div>
                   <h2 className="font-heading font-bold text-lg sm:text-xl text-navy">
-                    Where will the sessions take place?
+                    {isTutor ? 'Where can you travel to teach?' : 'Where will the sessions take place?'}
                   </h2>
                   <p className="text-xs sm:text-sm text-ink-muted mt-1">
                     Spectre provides in-person 1-on-1 home tuition across Delhi localities.
@@ -471,7 +508,7 @@ export const RequestTutor: React.FC = () => {
 
                 <div>
                   <label htmlFor="area-input" className="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-2">
-                    Area / Locality in Delhi <span className="text-red-500">*</span>
+                    {isTutor ? 'Your Preferred Localities in Delhi' : 'Area / Locality in Delhi'} <span className="text-red-500">*</span>
                   </label>
                   <input
                     id="area-input"
@@ -483,23 +520,23 @@ export const RequestTutor: React.FC = () => {
                     className="w-full text-sm p-3 rounded-md border border-border-subtle focus:outline-none focus:ring-2 focus:ring-navy focus:border-navy"
                   />
                   <p className="text-xs text-ink-muted mt-1.5">
-                    A simple locality name is enough so we can find tutors who can comfortably travel to your home.
+                    A simple locality name is enough so we can arrange suitable tutor visits.
                   </p>
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-2">
-                    Session Location
+                    Session Format
                   </label>
                   <div className="p-3 bg-slate-50 rounded-md border border-border-subtle flex items-center gap-2.5 text-sm font-medium text-navy">
                     <MapPin className="w-4 h-4 text-trust" />
-                    <span>At home (Student's residence in Delhi)</span>
+                    <span>In-person 1-on-1 Home Tuition (Delhi)</span>
                   </div>
                 </div>
 
                 <div>
                   <label htmlFor="landmark-input" className="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-2">
-                    Nearby Landmark (Optional)
+                    Nearby Landmark / Metro Station (Optional)
                   </label>
                   <input
                     id="landmark-input"
@@ -518,10 +555,12 @@ export const RequestTutor: React.FC = () => {
               <div className="space-y-6">
                 <div>
                   <h2 className="font-heading font-bold text-lg sm:text-xl text-navy">
-                    When would you like the sessions?
+                    {isTutor ? 'When are you available for sessions?' : 'When would you like the sessions?'}
                   </h2>
                   <p className="text-xs sm:text-sm text-ink-muted mt-1">
-                    Select your preferred days and timings for the home tutor visits.
+                    {isTutor
+                      ? 'Select the days and timings you have available for home tuition visits.'
+                      : 'Select your preferred days and timings for the home tutor visits.'}
                   </p>
                 </div>
 
@@ -605,7 +644,7 @@ export const RequestTutor: React.FC = () => {
               </div>
             )}
 
-            {/* STEP 5: PARENT CONTACT */}
+            {/* STEP 5: CONTACT */}
             {currentStep === 5 && (
               <div className="space-y-6">
                 <div>
@@ -613,19 +652,19 @@ export const RequestTutor: React.FC = () => {
                     How can we reach you?
                   </h2>
                   <p className="text-xs sm:text-sm text-ink-muted mt-1">
-                    A member of the Spectre team will contact you to discuss your request.
+                    A member of the Spectre team will contact you to discuss the details.
                   </p>
                 </div>
 
                 <div>
                   <label htmlFor="parent-name" className="block text-xs font-semibold uppercase tracking-wider text-ink-muted mb-2">
-                    Parent / Guardian Name <span className="text-red-500">*</span>
+                    {isTutor ? 'Tutor Full Name' : 'Parent / Guardian Name'} <span className="text-red-500">*</span>
                   </label>
                   <input
                     id="parent-name"
                     type="text"
                     required
-                    placeholder="e.g. Sunita Sharma"
+                    placeholder={isTutor ? 'e.g. Rahul Sharma' : 'e.g. Sunita Sharma'}
                     value={formData.parent_name}
                     onChange={(e) => setFormData({ ...formData, parent_name: e.target.value })}
                     className="w-full text-sm p-3 rounded-md border border-border-subtle focus:outline-none focus:ring-2 focus:ring-navy focus:border-navy"
@@ -651,7 +690,7 @@ export const RequestTutor: React.FC = () => {
                     />
                   </div>
                   <p className="text-xs text-ink-muted mt-1.5">
-                    We will use this number to discuss your child's requirements and tutor options.
+                    We will use this number to contact you and confirm next steps.
                   </p>
                 </div>
 
@@ -662,7 +701,7 @@ export const RequestTutor: React.FC = () => {
                   <input
                     id="email-input"
                     type="email"
-                    placeholder="e.g. parent@example.com"
+                    placeholder="e.g. contact@example.com"
                     value={formData.email || ''}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="w-full text-sm p-3 rounded-md border border-border-subtle focus:outline-none focus:ring-2 focus:ring-navy focus:border-navy"
@@ -671,9 +710,11 @@ export const RequestTutor: React.FC = () => {
 
                 {/* Brief Summary of selections */}
                 <div className="p-4 rounded-md bg-parchment border border-border-subtle space-y-2 text-xs">
-                  <p className="font-semibold text-navy">Request Summary:</p>
+                  <p className="font-semibold text-navy">
+                    {isTutor ? 'Tutor Application Summary:' : 'Request Summary:'}
+                  </p>
                   <p className="text-ink-muted">
-                    <span className="font-medium text-ink">Class:</span> {formData.student_class} ({formData.board || 'CBSE'}) &middot;{' '}
+                    <span className="font-medium text-ink">Level:</span> {formData.student_class} ({formData.board || 'CBSE'}) &middot;{' '}
                     <span className="font-medium text-ink">Subjects:</span> {formData.subjects.join(', ')} &middot;{' '}
                     <span className="font-medium text-ink">Location:</span> {formData.area}, Delhi
                   </p>
@@ -719,10 +760,10 @@ export const RequestTutor: React.FC = () => {
                     className="w-full sm:w-auto gap-2"
                   >
                     {isSubmitting ? (
-                      <span>Submitting Request...</span>
+                      <span>Submitting...</span>
                     ) : (
                       <>
-                        <span>Request My Tutor</span>
+                        <span>{isTutor ? 'Submit Tutor Profile' : 'Request My Tutor'}</span>
                         <Check className="w-4 h-4" />
                       </>
                     )}
@@ -734,7 +775,7 @@ export const RequestTutor: React.FC = () => {
             {/* Legal consent note below submit */}
             {currentStep === 5 && (
               <p className="mt-4 text-xs text-ink-muted text-center">
-                By submitting this request, you agree that Spectre Tutors Network may contact you regarding your tutoring request.
+                By submitting, you agree that Spectre Tutors Network may contact you regarding this tutoring request.
               </p>
             )}
           </form>
@@ -742,7 +783,7 @@ export const RequestTutor: React.FC = () => {
 
         {/* Small reassurance note below form card */}
         <div className="mt-6 text-center text-xs text-ink-muted space-y-1">
-          <p>No account required &middot; No advance booking fee &middot; Delhi home tuition</p>
+          <p>No account required &middot; 1-on-1 Delhi Home Tutoring &middot; Instant WhatsApp Alert</p>
         </div>
       </div>
     </div>

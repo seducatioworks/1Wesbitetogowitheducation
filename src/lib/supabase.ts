@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import type { TutorRequest } from '../types';
+import { sendAutomatedWhatsAppAlert } from './notifications';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
@@ -125,6 +126,7 @@ export async function submitTutorRequest(requestData: Omit<TutorRequest, 'id' | 
         return { success: true, data: newRequest };
       }
 
+      sendAutomatedWhatsAppAlert(data as TutorRequest).catch(() => {});
       return { success: true, data: data as TutorRequest };
     } catch (err) {
       console.error('Network error during Supabase insert:', err);
@@ -138,6 +140,9 @@ export async function submitTutorRequest(requestData: Omit<TutorRequest, 'id' | 
   const localList = getLocalRequests();
   const updated = [newRequest, ...localList];
   saveLocalRequests(updated);
+
+  // Send automated WhatsApp alert in background (non-blocking)
+  sendAutomatedWhatsAppAlert(newRequest).catch(() => {});
 
   return { success: true, data: newRequest };
 }
