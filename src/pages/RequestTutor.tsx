@@ -5,10 +5,16 @@ import {
   ArrowRight, 
   Check, 
   MapPin, 
-  AlertCircle
+  AlertCircle,
+  MessageSquare
 } from 'lucide-react';
 import { Button } from '../components/Button';
 import { submitTutorRequest } from '../lib/supabase';
+import { 
+  getSpectreWhatsAppNumber, 
+  generateWhatsAppMessage, 
+  createWhatsAppLink 
+} from '../lib/whatsapp';
 import type { TutorRequest, FormStep } from '../types';
 
 const CLASS_OPTIONS = [
@@ -207,24 +213,43 @@ export const RequestTutor: React.FC = () => {
       return;
     }
 
+    const whatsappNumber = getSpectreWhatsAppNumber();
+    if (!whatsappNumber) {
+      setValidationError('Spectre business WhatsApp number is not configured.');
+      return;
+    }
+
+    const message = generateWhatsAppMessage(formData);
+    if (!message.trim()) {
+      setValidationError('Unable to generate request message. Please review the form fields.');
+      return;
+    }
+
     setIsSubmitting(true);
     setValidationError(null);
 
     try {
       const result = await submitTutorRequest(formData);
-      if (result.success) {
-        navigate('/request-success', {
-          state: {
-            request: result.data || {
-              ...formData,
-              id: `req-${Date.now().toString(36)}`,
-              created_at: new Date().toISOString(),
-            },
-          },
-        });
-      } else {
-        setValidationError(result.error || "We couldn't submit your request right now. Please try again.");
+      const whatsappUrl = createWhatsAppLink(whatsappNumber, message);
+
+      // Open WhatsApp click-to-chat
+      try {
+        window.open(whatsappUrl, '_blank');
+      } catch (e) {
+        console.warn('Popup blocked, WhatsApp link will be available on confirmation page:', e);
       }
+
+      navigate('/request-success', {
+        state: {
+          request: result.data || {
+            ...formData,
+            id: `req-${Date.now().toString(36)}`,
+            created_at: new Date().toISOString(),
+          },
+          whatsappUrl,
+          message,
+        },
+      });
     } catch (err) {
       setValidationError("We couldn't submit your request right now. Please try again.");
     } finally {
@@ -752,22 +777,27 @@ export const RequestTutor: React.FC = () => {
                     <ArrowRight className="w-4 h-4" />
                   </Button>
                 ) : (
-                  <Button
-                    type="submit"
-                    variant="primary"
-                    size="lg"
-                    disabled={isSubmitting}
-                    className="w-full sm:w-auto gap-2"
-                  >
-                    {isSubmitting ? (
-                      <span>Submitting...</span>
-                    ) : (
-                      <>
-                        <span>{isTutor ? 'Submit Tutor Profile' : 'Request My Tutor'}</span>
-                        <Check className="w-4 h-4" />
-                      </>
-                    )}
-                  </Button>
+                  <div className="flex flex-col items-stretch sm:items-end gap-1.5 w-full sm:w-auto">
+                    <Button
+                      type="submit"
+                      variant="primary"
+                      size="lg"
+                      disabled={isSubmitting}
+                      className="w-full sm:w-auto gap-2 bg-[#25D366] hover:bg-[#20bd5a] border-[#25D366] text-white font-bold shadow-sm"
+                    >
+                      {isSubmitting ? (
+                        <span>Preparing WhatsApp...</span>
+                      ) : (
+                        <>
+                          <MessageSquare className="w-5 h-5" />
+                          <span>{isTutor ? 'Apply as Tutor on WhatsApp' : 'Request Tutor on WhatsApp'}</span>
+                        </>
+                      )}
+                    </Button>
+                    <span className="text-[11px] text-ink-muted text-center sm:text-right">
+                      We'll open WhatsApp with your request ready to send.
+                    </span>
+                  </div>
                 )}
               </div>
             </div>

@@ -15,9 +15,9 @@ import {
 } from 'lucide-react';
 import { getTutorRequests, updateRequestStatus, isSupabaseConfigured } from '../lib/supabase';
 import { 
-  getAdminReplyWhatsAppUrl, 
-  formatRequestAsWhatsAppTextForm 
-} from '../lib/notifications';
+  createAdminReplyWhatsAppLink, 
+  generateWhatsAppMessage 
+} from '../lib/whatsapp';
 import type { TutorRequest } from '../types';
 
 export const Admin: React.FC = () => {
@@ -54,7 +54,7 @@ export const Admin: React.FC = () => {
   };
 
   const handleCopyTextForm = (req: TutorRequest) => {
-    const text = formatRequestAsWhatsAppTextForm(req);
+    const text = generateWhatsAppMessage(req);
     navigator.clipboard.writeText(text);
     setCopiedId(req.id || 'current');
     setTimeout(() => setCopiedId(null), 2500);
@@ -313,7 +313,7 @@ export const Admin: React.FC = () => {
                       {/* Actions */}
                       <td className="py-3 px-4 whitespace-nowrap text-right space-x-2">
                         <a
-                          href={getAdminReplyWhatsAppUrl(req)}
+                          href={createAdminReplyWhatsAppLink(req)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#25D366]/10 text-[#1b8a43] hover:bg-[#25D366]/20 font-semibold text-xs transition-colors"
@@ -373,7 +373,7 @@ export const Admin: React.FC = () => {
               {/* Quick WhatsApp outreach button */}
               <div className="flex flex-wrap gap-2 pt-1 pb-3 border-b border-slate-100">
                 <a
-                  href={getAdminReplyWhatsAppUrl(selectedRequest)}
+                  href={createAdminReplyWhatsAppLink(selectedRequest)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold transition-all shadow-xs"
@@ -387,17 +387,17 @@ export const Admin: React.FC = () => {
                   className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md bg-slate-100 hover:bg-slate-200 text-navy text-xs font-semibold transition-colors"
                 >
                   {copiedId ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
-                  <span>{copiedId ? 'Copied Text Form!' : 'Copy WhatsApp Form Text'}</span>
+                  <span>{copiedId ? 'Copied Message!' : 'Copy WhatsApp Message'}</span>
                 </button>
               </div>
 
               {/* WhatsApp Text Form Preview Box */}
               <div>
                 <label className="text-xs font-semibold uppercase tracking-wider text-ink-muted block mb-1">
-                  WhatsApp Text Form (Ready to Forward):
+                  Pre-filled WhatsApp Message:
                 </label>
                 <pre className="p-3 bg-slate-50 rounded border border-border-subtle text-[11px] font-mono text-slate-800 whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto">
-                  {formatRequestAsWhatsAppTextForm(selectedRequest)}
+                  {generateWhatsAppMessage(selectedRequest)}
                 </pre>
               </div>
 

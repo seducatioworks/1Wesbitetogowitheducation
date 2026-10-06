@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { CheckCircle, Home, MessageSquare, Copy, Check, Sparkles } from 'lucide-react';
+import { CheckCircle, Home, MessageSquare, Copy, Check, ExternalLink } from 'lucide-react';
 import { Button } from '../components/Button';
 import { 
-  formatRequestAsWhatsAppTextForm, 
-  getDirectWhatsAppClickUrl 
-} from '../lib/notifications';
+  getSpectreWhatsAppNumber, 
+  generateWhatsAppMessage, 
+  createWhatsAppLink 
+} from '../lib/whatsapp';
 import type { TutorRequest } from '../types';
 
 export const Success: React.FC = () => {
@@ -14,26 +15,28 @@ export const Success: React.FC = () => {
 
   // Retrieve submitted request or construct fallback
   const rawRequest = (location.state as any)?.request;
-  const requestDetails = (location.state as any)?.requestDetails;
+  const passedMessage = (location.state as any)?.message;
+  const passedUrl = (location.state as any)?.whatsappUrl;
 
   const request: TutorRequest = rawRequest || {
-    parent_name: requestDetails?.parentName || 'Parent',
-    phone: requestDetails?.phone || '',
-    student_class: requestDetails?.studentClass || 'Class 10',
-    subjects: requestDetails?.subjects || ['Mathematics'],
+    parent_name: 'Parent',
+    phone: '',
+    student_class: 'Class 10',
+    subjects: ['Mathematics'],
     help_needed: ['Concept clarity'],
-    area: requestDetails?.area || 'Delhi',
+    area: 'Delhi',
     preferred_days: ['Monday', 'Wednesday', 'Friday'],
     preferred_time: 'Evening',
     user_type: 'parent',
   };
 
   const isTutor = request.user_type === 'tutor';
-  const textForm = formatRequestAsWhatsAppTextForm(request);
-  const directWhatsAppUrl = getDirectWhatsAppClickUrl(request);
+  const whatsappNumber = getSpectreWhatsAppNumber();
+  const message = passedMessage || generateWhatsAppMessage(request);
+  const whatsappUrl = passedUrl || createWhatsAppLink(whatsappNumber, message);
 
   const handleCopyText = () => {
-    navigator.clipboard.writeText(textForm);
+    navigator.clipboard.writeText(message);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   };
@@ -50,81 +53,83 @@ export const Success: React.FC = () => {
 
           {/* Heading */}
           <h1 className="font-heading font-extrabold text-2xl sm:text-3xl text-navy tracking-tight">
-            {isTutor ? "We've received your tutor profile." : "We've received your request."}
+            {isTutor ? "Your Tutor Profile is Ready" : "Your Request is Ready"}
           </h1>
 
           {/* Supporting text */}
           <p className="mt-2 text-sm sm:text-base text-ink-muted leading-relaxed">
             {isTutor
-              ? 'Thank you for applying to the Spectre Network. Our team will review your teaching preferences and connect with you.'
-              : 'Thank you. Our team will review your requirements and contact you regarding the next steps.'}
+              ? 'Your application details have been formatted. Review the message below and send it on WhatsApp to complete your application.'
+              : 'Your requirements have been formatted. Review the message below and send it on WhatsApp to connect with our coordinator.'}
           </p>
 
-          {/* Instant WhatsApp CTA Button */}
-          <div className="mt-6 mb-6 p-4 rounded-lg bg-emerald-50 border border-emerald-200 text-left">
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 mt-0.5">
+          {/* WhatsApp Click-to-Chat Card */}
+          <div className="mt-6 mb-6 p-5 rounded-lg bg-emerald-50 border border-emerald-200 text-left">
+            <div className="flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-full bg-[#25D366] text-white flex items-center justify-center shrink-0 shadow-xs">
                 <MessageSquare className="w-5 h-5" />
               </div>
               <div className="flex-grow">
                 <div className="flex items-center gap-2">
-                  <h4 className="font-heading font-bold text-sm text-emerald-950">
-                    Connect Instantly on WhatsApp
+                  <h4 className="font-heading font-bold text-sm sm:text-base text-emerald-950">
+                    Send via WhatsApp
                   </h4>
-                  <span className="text-[10px] font-semibold bg-emerald-200 text-emerald-800 px-1.5 py-0.5 rounded">
-                    Instant
+                  <span className="text-[10px] font-semibold bg-emerald-200 text-emerald-900 px-1.5 py-0.5 rounded">
+                    wa.me
                   </span>
                 </div>
-                <p className="text-xs text-emerald-800 mt-0.5 leading-relaxed">
-                  Tap below to send this request text directly to our Delhi coordinator's WhatsApp chat.
+                <p className="text-xs text-emerald-800 mt-1 leading-relaxed">
+                  We've prepared your message. Tap below to open WhatsApp, review your text, and press <strong>Send</strong>.
                 </p>
-                <div className="mt-3 flex flex-wrap gap-2">
+
+                <div className="mt-4 flex flex-wrap gap-2.5">
                   <a
-                    href={directWhatsAppUrl}
+                    href={whatsappUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold transition-all shadow-xs"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs sm:text-sm font-bold transition-all shadow-sm"
                   >
                     <MessageSquare className="w-4 h-4" />
                     <span>Open in WhatsApp</span>
+                    <ExternalLink className="w-3.5 h-3.5 opacity-80" />
                   </a>
+
                   <button
                     type="button"
                     onClick={handleCopyText}
-                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md bg-white border border-emerald-300 text-emerald-900 text-xs font-semibold hover:bg-emerald-50 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-md bg-white border border-emerald-300 text-emerald-900 text-xs font-semibold hover:bg-emerald-50 transition-colors"
                   >
                     {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copied ? 'Copied to Clipboard!' : 'Copy Form Text'}</span>
+                    <span>{copied ? 'Copied Message!' : 'Copy Message'}</span>
                   </button>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Form Text in Chat Preview */}
+          {/* Pre-filled Message Review Card */}
           <div className="border border-border-subtle rounded-md overflow-hidden text-left mb-6 bg-slate-50">
             <div className="bg-slate-100 px-4 py-2 border-b border-border-subtle flex items-center justify-between">
-              <span className="text-xs font-mono font-semibold text-slate-700 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-trust" />
-                <span>Message Text (Delivered to Chat)</span>
+              <span className="text-xs font-semibold text-slate-700">
+                Pre-filled Message Preview
               </span>
               <button
                 type="button"
                 onClick={handleCopyText}
                 className="text-[11px] font-semibold text-trust hover:underline flex items-center gap-1"
               >
-                {copied ? 'Copied!' : 'Copy text'}
+                {copied ? 'Copied!' : 'Copy'}
               </button>
             </div>
             <pre className="p-4 text-xs font-mono text-slate-800 whitespace-pre-wrap leading-relaxed max-h-56 overflow-y-auto bg-[#F8FAFC]">
-              {textForm}
+              {message}
             </pre>
           </div>
 
           {/* What happens next */}
           <div className="border-t border-border-subtle pt-5 mb-6 text-left">
             <h4 className="font-heading font-bold text-xs uppercase tracking-wider text-navy mb-3">
-              What Happens Next
+              How It Works
             </h4>
             <div className="space-y-2.5 text-xs text-ink-muted">
               <div className="flex items-start gap-2.5">
@@ -132,7 +137,7 @@ export const Success: React.FC = () => {
                   1
                 </span>
                 <p>
-                  A Spectre coordinator receives your request text and reviews locality in Delhi.
+                  WhatsApp opens with your message already typed out.
                 </p>
               </div>
               <div className="flex items-start gap-2.5">
@@ -140,7 +145,7 @@ export const Success: React.FC = () => {
                   2
                 </span>
                 <p>
-                  We reach out to you via WhatsApp or phone call to confirm timings and tutor matching.
+                  You can review or make any changes to the text and press Send.
                 </p>
               </div>
               <div className="flex items-start gap-2.5">
@@ -148,7 +153,7 @@ export const Success: React.FC = () => {
                   3
                 </span>
                 <p>
-                  The first 1-on-1 home session is scheduled at your convenience.
+                  Our Delhi coordinator replies directly to your WhatsApp chat.
                 </p>
               </div>
             </div>
@@ -161,7 +166,7 @@ export const Success: React.FC = () => {
               <span>Back to Home</span>
             </Button>
             <Button to="/request-tutor" variant="outline" size="md" className="w-full sm:w-auto">
-              <span>Submit Another Request</span>
+              <span>Start New Request</span>
             </Button>
           </div>
 
