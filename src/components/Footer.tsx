@@ -80,6 +80,11 @@ export const Footer: React.FC = () => {
                   FAQ
                 </a>
               </li>
+              <li>
+                <Link to="/request-tutor?type=tutor" className="text-trust hover:text-trust-light transition-colors font-medium">
+                  Join as a Tutor
+                </Link>
+              </li>
             </ul>
           </div>
 

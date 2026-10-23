@@ -29,6 +29,7 @@ export const Navbar: React.FC = () => {
     { label: 'Why Spectre', href: '/#why-spectre' },
     { label: 'Subjects', href: '/#subjects' },
     { label: 'FAQ', href: '/#faq' },
+    { label: 'For Tutors', href: '/request-tutor?type=tutor' },
   ];
 
   const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {

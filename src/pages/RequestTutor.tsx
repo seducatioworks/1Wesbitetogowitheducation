@@ -105,8 +105,14 @@ export const RequestTutor: React.FC = () => {
 
   const isTutor = formData.user_type === 'tutor';
 
-  // Handle preselected values from navigation state
+  // Handle preselected values and role from navigation state or URL
   useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const roleParam = params.get('type') || params.get('role');
+    if (roleParam === 'tutor' || (location.state && (location.state as any).userType === 'tutor')) {
+      setFormData((prev) => ({ ...prev, user_type: 'tutor' }));
+    }
+
     if (location.state && (location.state as any).preselectedHelp) {
       const helpVal = (location.state as any).preselectedHelp;
       setFormData((prev) => ({
@@ -114,7 +120,7 @@ export const RequestTutor: React.FC = () => {
         help_needed: prev.help_needed.includes(helpVal) ? prev.help_needed : [...prev.help_needed, helpVal],
       }));
     }
-  }, [location.state]);
+  }, [location.state, location.search]);
 
   // Validation per step
   const validateStep = (step: FormStep): boolean => {

@@ -17,7 +17,13 @@ export function getSpectreWhatsAppNumber(): string {
  * Only includes fields that have valid values.
  */
 export function generateParentWhatsAppMessage(request: TutorRequest): string {
-  const lines: string[] = ["Hi Spectre Tutors! I'd like help finding a tutor.", ""];
+  const parentName = request.parent_name && request.parent_name.trim() ? request.parent_name.trim() : 'Parent';
+  const lines: string[] = [
+    "Hi Spectre Tutors!",
+    `I am a parent: ${parentName}`,
+    "",
+    "I'd like help finding a home tutor."
+  ];
 
   if (request.student_class) {
     const boardSuffix = request.board && request.board !== 'Not sure' ? ` (${request.board})` : '';
@@ -44,10 +50,6 @@ export function generateParentWhatsAppMessage(request: TutorRequest): string {
     lines.push(`Schedule: ${request.preferred_days.join(', ')}${timeSuffix}`);
   }
 
-  if (request.parent_name) {
-    lines.push(`Parent Name: ${request.parent_name}`);
-  }
-
   if (request.phone) {
     lines.push(`Phone: +91 ${request.phone}`);
   }
@@ -67,11 +69,13 @@ export function generateParentWhatsAppMessage(request: TutorRequest): string {
  * Only includes fields that have valid values.
  */
 export function generateTutorWhatsAppMessage(request: TutorRequest): string {
-  const lines: string[] = ["Hi Spectre Tutors! I'd like to apply as a tutor.", ""];
-
-  if (request.parent_name) {
-    lines.push(`Name: ${request.parent_name}`);
-  }
+  const tutorName = request.parent_name && request.parent_name.trim() ? request.parent_name.trim() : 'Tutor';
+  const lines: string[] = [
+    "Hi Spectre Tutors!",
+    `I am a tutor: ${tutorName}`,
+    "",
+    "I'd like to apply as a home tutor in Delhi."
+  ];
 
   if (request.subjects && request.subjects.length > 0) {
     lines.push(`Subjects: ${request.subjects.join(', ')}`);
@@ -85,6 +89,8 @@ export function generateTutorWhatsAppMessage(request: TutorRequest): string {
     lines.push(`Area: ${request.area}`);
   }
 
+  lines.push("Mode: Home tuition");
+
   if (request.preferred_days && request.preferred_days.length > 0) {
     const timeSuffix = request.preferred_time ? ` (${request.preferred_time})` : '';
     lines.push(`Availability: ${request.preferred_days.join(', ')}${timeSuffix}`);
@@ -95,7 +101,7 @@ export function generateTutorWhatsAppMessage(request: TutorRequest): string {
   }
 
   if (request.additional_message && request.additional_message.trim()) {
-    lines.push(`Note: ${request.additional_message.trim()}`);
+    lines.push(`Details / Experience: ${request.additional_message.trim()}`);
   }
 
   lines.push("");

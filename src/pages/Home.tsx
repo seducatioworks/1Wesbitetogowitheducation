@@ -366,6 +366,36 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
+      {/* 8B. FOR TUTORS SECTION */}
+      <section id="for-tutors" className="py-16 bg-white border-b border-border-subtle">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="rounded-lg p-8 sm:p-10 border border-border-subtle bg-parchment flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="space-y-2 max-w-xl">
+              <span className="inline-block text-xs font-semibold tracking-wider uppercase text-trust bg-trust-light px-2.5 py-1 rounded-sm">
+                Educator Network
+              </span>
+              <h2 className="font-heading font-bold text-2xl text-navy">
+                Are you a home tutor in Delhi?
+              </h2>
+              <p className="text-sm text-ink-muted leading-relaxed">
+                Join our network to teach Mathematics, Science, or English to Classes 6–12 students. Send your subjects, preferred localities, and schedule directly to our WhatsApp coordinator.
+              </p>
+            </div>
+            <div className="shrink-0 w-full md:w-auto">
+              <Button
+                to="/request-tutor?type=tutor"
+                variant="primary"
+                size="md"
+                className="w-full md:w-auto gap-2 bg-[#25D366] hover:bg-[#20bd5a] border-[#25D366] text-white font-bold"
+              >
+                <span>Apply as a Tutor</span>
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 9. FAQ SECTION */}
       <section id="faq" className="py-16 bg-parchment">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
