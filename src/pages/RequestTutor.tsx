@@ -294,24 +294,24 @@ export const RequestTutor: React.FC = () => {
             <button
               type="button"
               onClick={() => setFormData({ ...formData, user_type: 'parent' })}
-              className={`flex-1 py-2 px-3 text-xs font-semibold rounded transition-all ${
+              className={`flex-1 py-2 px-3 text-xs sm:text-sm font-semibold rounded transition-all ${
                 !isTutor
                   ? 'bg-white text-navy shadow-xs border border-border-subtle'
                   : 'text-ink-muted hover:text-navy'
               }`}
             >
-              👨‍👩‍👧 Parent / Guardian (Request a Tutor)
+              👨‍👩‍👧 Request a Tutor (Parents)
             </button>
             <button
               type="button"
               onClick={() => setFormData({ ...formData, user_type: 'tutor' })}
-              className={`flex-1 py-2 px-3 text-xs font-semibold rounded transition-all ${
+              className={`flex-1 py-2 px-3 text-xs sm:text-sm font-semibold rounded transition-all ${
                 isTutor
                   ? 'bg-white text-navy shadow-xs border border-border-subtle'
                   : 'text-ink-muted hover:text-navy'
               }`}
             >
-              🧑‍🏫 Tutor / Educator (Join Network)
+              🧑‍🏫 Become a Tutor (Educators)
             </button>
           </div>
 
@@ -796,7 +796,7 @@ export const RequestTutor: React.FC = () => {
                       ) : (
                         <>
                           <MessageSquare className="w-5 h-5" />
-                          <span>{isTutor ? 'Apply as Tutor on WhatsApp' : 'Request Tutor on WhatsApp'}</span>
+                          <span>{isTutor ? 'Become a Tutor on WhatsApp' : 'Request Tutor on WhatsApp'}</span>
                         </>
                       )}
                     </Button>

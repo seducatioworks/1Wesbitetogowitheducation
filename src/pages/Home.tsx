@@ -66,11 +66,14 @@ export const Home: React.FC = () => {
                   <span>Request a Tutor</span>
                   <ArrowRight className="w-4 h-4" />
                 </Button>
+                <Button to="/request-tutor?type=tutor" variant="secondary" size="lg">
+                  <span>Become a Tutor</span>
+                </Button>
                 <a
                   href="#how-it-works"
-                  className="inline-flex items-center justify-center font-medium text-navy hover:text-navy-dark bg-white hover:bg-slate-50 border border-border-subtle rounded-md px-5 py-3 text-base shadow-sm transition-colors text-center"
+                  className="inline-flex items-center justify-center font-medium text-ink-muted hover:text-navy px-3 py-3 text-sm transition-colors text-center"
                 >
-                  How It Works
+                  How It Works →
                 </a>
               </div>
 
@@ -388,7 +391,7 @@ export const Home: React.FC = () => {
                 size="md"
                 className="w-full md:w-auto gap-2 bg-[#25D366] hover:bg-[#20bd5a] border-[#25D366] text-white font-bold"
               >
-                <span>Apply as a Tutor</span>
+                <span>Become a Tutor</span>
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </div>

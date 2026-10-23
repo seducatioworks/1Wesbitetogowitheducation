@@ -29,7 +29,6 @@ export const Navbar: React.FC = () => {
     { label: 'Why Spectre', href: '/#why-spectre' },
     { label: 'Subjects', href: '/#subjects' },
     { label: 'FAQ', href: '/#faq' },
-    { label: 'For Tutors', href: '/request-tutor?type=tutor' },
   ];
 
   const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -81,8 +80,11 @@ export const Navbar: React.FC = () => {
               ))}
             </nav>
 
-            {/* Desktop CTA */}
-            <div className="hidden md:flex items-center space-x-4">
+            {/* Desktop CTAs */}
+            <div className="hidden md:flex items-center space-x-3">
+              <Button to="/request-tutor?type=tutor" variant="secondary" size="md">
+                Become a Tutor
+              </Button>
               <Button to="/request-tutor" variant="primary" size="md">
                 Request a Tutor
               </Button>
@@ -162,18 +164,26 @@ export const Navbar: React.FC = () => {
           </nav>
         </div>
 
-        {/* Drawer Footer CTA */}
-        <div className="pt-6 border-t border-border-subtle flex flex-col space-y-3">
+        {/* Drawer Footer CTAs */}
+        <div className="pt-6 border-t border-border-subtle flex flex-col space-y-2.5">
           <Button
             to="/request-tutor"
             variant="primary"
-            size="lg"
+            size="md"
             className="w-full flex items-center justify-center gap-2"
           >
             <span>Request a Tutor</span>
             <ArrowRight className="w-4 h-4" />
           </Button>
-          <p className="text-xs text-center text-ink-muted">
+          <Button
+            to="/request-tutor?type=tutor"
+            variant="secondary"
+            size="md"
+            className="w-full flex items-center justify-center gap-2"
+          >
+            <span>Become a Tutor</span>
+          </Button>
+          <p className="text-xs text-center text-ink-muted pt-1">
             1-on-1 Home Tuition in Delhi
           </p>
         </div>
