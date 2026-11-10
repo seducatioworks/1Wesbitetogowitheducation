@@ -18,19 +18,19 @@ export const Button: React.FC<ButtonProps> = ({
   disabled,
   ...props
 }) => {
-  const baseStyles = 'inline-flex items-center justify-center font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 select-none disabled:opacity-60 disabled:cursor-not-allowed';
+  const baseStyles = 'inline-flex items-center justify-center font-semibold transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-1 select-none disabled:opacity-60 disabled:cursor-not-allowed';
 
   const sizeStyles = {
-    sm: 'text-sm px-3.5 py-1.5 rounded-sm',
-    md: 'text-base px-5 py-2.5 rounded-md',
-    lg: 'text-base sm:text-lg px-6 py-3.5 rounded-md font-semibold',
+    sm: 'text-xs px-3.5 py-1.5 rounded-sm tracking-wide',
+    md: 'text-xs sm:text-sm px-4 py-2 rounded-sm tracking-wide',
+    lg: 'text-sm sm:text-base px-5 py-2.5 rounded-sm tracking-wide',
   }[size];
 
   const variantStyles = {
-    primary: 'bg-navy text-white hover:bg-navy-dark focus:ring-navy border border-navy shadow-sm',
-    secondary: 'bg-white text-navy hover:bg-slate-50 focus:ring-slate-300 border border-border-subtle shadow-sm',
-    outline: 'bg-transparent text-navy hover:bg-navy/5 border border-navy/30 focus:ring-navy',
-    subtle: 'bg-trust-light text-trust hover:bg-trust-light/80 border border-trust/20 focus:ring-trust',
+    primary: 'bg-navy text-white hover:bg-midnight focus:ring-navy border border-navy shadow-xs',
+    secondary: 'bg-white text-navy hover:bg-surface focus:ring-academic border border-navy/40 shadow-xs',
+    outline: 'bg-transparent text-navy hover:bg-navy/5 border border-navy/30 focus:ring-academic',
+    subtle: 'bg-surface text-navy hover:bg-surface-blue border border-border focus:ring-academic',
   }[variant];
 
   const combinedStyles = `${baseStyles} ${sizeStyles} ${variantStyles} ${className}`;

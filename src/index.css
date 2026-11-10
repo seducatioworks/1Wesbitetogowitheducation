@@ -2,21 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-navy: #172B4D;
+  --color-navy-dark: #0F1D33;
+  --color-navy-light: #213A65;
+  --color-cream: #FFF4E3;
+  --color-cream-soft: #FFFDF8;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
-    font-family: 'Inter', sans-serif;
-    color: #172033;
-    background-color: #FFFDF8;
+    font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+    color: #172B4D;
+    background-color: #FCFCFA;
+  }
+
+  body {
+    font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+    font-weight: 400;
+    color: #172B4D;
+    line-height: 1.6;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Manrope', sans-serif;
+    font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+    font-weight: 700;
     color: #172B4D;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
   }
 }
 
-/* Custom scrollbar and subtle transitions */
+/* Base border consistency */
 * {
   border-color: #E2E8F0;
 }

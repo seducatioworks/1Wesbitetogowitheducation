@@ -6,22 +6,24 @@ import {
   ShieldCheck, 
   UserCheck, 
   BookOpen, 
-  Sparkles, 
-  ChevronDown,
-  MapPin,
-  Clock,
-  Compass
+  ChevronDown, 
+  MessageSquare,
+  ArrowUpRight
 } from 'lucide-react';
 import { Button } from '../components/Button';
 import { SectionHeading } from '../components/SectionHeading';
 import { 
-  TRUST_STRIP_ITEMS, 
   CHILD_NEED_CARDS, 
+  PERSONALISATION_POINTS, 
+  EDUCATIONAL_SERVICES, 
+  SPECTRE_APPROACH_STEPS, 
   SUBJECTS_DATA, 
-  HOW_IT_WORKS_STEPS, 
-  WHY_SPECTRE_PRINCIPLES, 
-  FAQ_ITEMS 
+  EDUCATOR_STANDARDS, 
+  PARENT_DIAGNOSTIC_QUESTIONS, 
+  FAQ_ITEMS,
+  SITE_METADATA 
 } from '../data/content';
+import { ARTICLES } from '../data/articles';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -35,85 +37,89 @@ export const Home: React.FC = () => {
     navigate('/request-tutor', { state: { preselectedHelp: helpValue } });
   };
 
+  const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    const id = href.replace('/#', '').replace('#', '');
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* 1. HERO SECTION */}
-      <section className="relative pt-8 pb-16 md:pt-14 md:pb-24 border-b border-border-subtle bg-parchment">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+    <div className="flex flex-col min-h-screen bg-warm-white text-navy font-sans">
+      
+      {/* =========================================================================
+          SECTION 1 — HERO
+          Modern academic institutional presentation: clarity, competence, composure.
+         ========================================================================= */}
+      <section id="hero" className="relative pt-12 pb-16 md:pt-16 md:pb-24 border-b border-border bg-warm-white scroll-mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             
-            {/* Left Column: Headline and CTAs */}
+            {/* Left Column: Academic Positioning */}
             <div className="lg:col-span-7 flex flex-col items-start space-y-6">
-              {/* Location Badge */}
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm bg-trust-light border border-trust/20 text-xs font-semibold text-trust tracking-wide">
-                <MapPin className="w-3.5 h-3.5" />
-                <span>Delhi &middot; 1-on-1 Home Tuition &middot; Classes 6–12</span>
+              
+              {/* Institutional Context Badge */}
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-sm bg-surface-blue border border-academic/20 text-[11px] font-semibold text-academic tracking-wider uppercase">
+                <span>DELHI · PRIVATE ONE-TO-ONE EDUCATION · CLASSES 6–12</span>
               </div>
 
               {/* Main Headline */}
-              <h1 className="font-heading font-extrabold text-3xl sm:text-4xl lg:text-5xl text-navy leading-[1.18] tracking-tight">
-                The right tutor can change how a child feels about learning.
+              <h1 className="font-extrabold text-3xl sm:text-5xl lg:text-[52px] text-navy leading-[1.15] tracking-tight">
+                The right education begins with understanding the student.
               </h1>
 
               {/* Supporting Copy */}
-              <p className="text-base sm:text-lg text-ink-muted leading-relaxed max-w-xl">
-                Find a trusted 1-on-1 home tutor for Mathematics, Science or English. Tell us what your child needs, and we’ll help you find a suitable tutor.
+              <p className="text-base sm:text-lg text-slate-dark leading-relaxed max-w-xl font-normal">
+                Thoughtfully matched private educators, personalised academic support and mentorship for students who deserve individual attention.
               </p>
 
-              {/* Actions / CTAs */}
+              {/* Primary & Secondary CTAs */}
               <div className="w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
                 <Button to="/request-tutor" variant="primary" size="lg" className="gap-2">
-                  <span>Request a Tutor</span>
+                  <span>Request an Educator</span>
                   <ArrowRight className="w-4 h-4" />
-                </Button>
-                <Button to="/request-tutor?type=tutor" variant="secondary" size="lg">
-                  <span>Become a Tutor</span>
                 </Button>
                 <a
                   href="#how-it-works"
-                  className="inline-flex items-center justify-center font-medium text-ink-muted hover:text-navy px-3 py-3 text-sm transition-colors text-center"
+                  onClick={(e) => handleScrollTo(e, '#how-it-works')}
+                  className="inline-flex items-center justify-center text-xs sm:text-sm font-semibold text-navy hover:text-midnight px-4 py-2.5 rounded-sm border border-navy/30 bg-white hover:bg-surface transition-colors shadow-xs text-center"
                 >
-                  How It Works →
+                  Explore Our Approach
                 </a>
               </div>
 
-              {/* Subtle Trust Indicators */}
-              <div className="pt-4 flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-ink-muted border-t border-border-subtle/80 w-full">
-                <div className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-trust" />
-                  <span>No upfront fees to request</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-trust" />
-                  <span>Human review for every request</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-trust" />
-                  <span>In-home 1-on-1 sessions</span>
-                </div>
+              {/* Institutional Scope Bullet */}
+              <div className="pt-4 border-t border-border w-full flex items-center gap-2 text-xs text-slate-dark">
+                <div className="w-1.5 h-1.5 rounded-full bg-academic" />
+                <span>One-to-one in-home instruction across Delhi for Mathematics, Science and English.</span>
               </div>
             </div>
 
-            {/* Right Column: Authentic Education Visual */}
+            {/* Right Column: Authentic Learning Photography */}
             <div className="lg:col-span-5 relative">
-              <div className="relative rounded-lg overflow-hidden border border-border-card shadow-md bg-white">
+              <div className="relative rounded-sm overflow-hidden border border-border shadow-xs bg-white">
                 <img
                   src="/images/home_tutoring_hero.jpg"
-                  alt="Student and tutor studying mathematics at home desk in Delhi"
-                  className="w-full h-[340px] sm:h-[400px] object-cover"
+                  alt="Private educator mentoring a student in an in-home study in Delhi"
+                  className="w-full h-[320px] sm:h-[400px] object-cover"
                   loading="eager"
+                  fetchPriority="high"
+                  width={1200}
+                  height={896}
                 />
-                {/* Clean caption card */}
-                <div className="p-4 bg-white border-t border-border-subtle flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-sm bg-trust-light flex items-center justify-center text-trust shrink-0 mt-0.5">
+                {/* Institutional Caption */}
+                <div className="p-4 sm:p-5 bg-white border-t border-border flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-sm bg-surface-blue flex items-center justify-center text-academic shrink-0 mt-0.5">
                     <BookOpen className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-navy">
-                      1-on-1 Learning at Home
+                    <p className="text-sm font-bold text-navy leading-snug">
+                      Individual Academic Mentorship
                     </p>
-                    <p className="text-xs text-ink-muted leading-normal mt-0.5">
-                      Personalised attention, paced for your child's curriculum and learning style.
+                    <p className="text-xs text-slate-dark leading-normal mt-0.5">
+                      Paced carefully around your child’s school curriculum, conceptual understanding and learning style.
                     </p>
                   </div>
                 </div>
@@ -124,26 +130,56 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* 2. TRUST STRIP */}
-      <section className="bg-white py-12 border-b border-border-subtle">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
-            <h3 className="font-heading font-bold text-xl sm:text-2xl text-navy">
-              Focused on what actually matters.
-            </h3>
+      {/* =========================================================================
+          SECTION 2 — THE CENTRAL PHILOSOPHY / WHY SPECTRE
+         ========================================================================= */}
+      <section id="why-spectre" className="py-16 sm:py-20 bg-white border-b border-border scroll-mt-20">
+        <span id="philosophy" className="sr-only" aria-hidden="true" />
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <span className="inline-block text-[11px] font-semibold tracking-wider uppercase text-academic bg-surface-blue border border-academic/20 px-2.5 py-0.5 rounded-sm mb-3">
+              Institutional Principle
+            </span>
+            <h2 className="font-bold text-2xl sm:text-3xl lg:text-4xl text-navy tracking-tight leading-[1.2]">
+              Not every good teacher is the right teacher for every student.
+            </h2>
+            <div className="h-0.5 w-12 bg-academic mx-auto my-6" />
+            <div className="text-sm sm:text-base text-slate-dark leading-relaxed space-y-4 text-left sm:text-center">
+              <p>
+                In conventional schooling, an educator is assigned based on administrative schedules and room capacity. A student who learns through intuitive, multi-step problem solving is placed in the same room as one who requires patient arithmetic reinforcement.
+              </p>
+              <p className="font-semibold text-navy text-base sm:text-lg">
+                Spectre Education begins with an opposite premise: instruction must bend around the cognitive pace of the learner.
+              </p>
+            </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {TRUST_STRIP_ITEMS.map((item) => (
-              <div
-                key={item.title}
-                className="bg-parchment p-6 rounded-md border border-border-subtle flex flex-col justify-between"
-              >
+
+          {/* Three Foundational Principles */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
+            {[
+              {
+                title: 'Subject Compatibility',
+                desc: 'An educator who scored 99% in university physics may struggle to explain foundational algebra to a hesitant Class 8 student. We pair educators based on pedagogical communication style, not paper prestige alone.',
+              },
+              {
+                title: 'Pedagogical Patience',
+                desc: 'Confidence is rarely built through authoritative pressure. It develops when a student feels safe to ask the unasked question without fear of embarrassment.',
+              },
+              {
+                title: 'Methodological Consistency',
+                desc: 'Sporadic cramming before exams creates chronic academic anxiety. A structured weekly schedule builds sustainable mastery and calm exam temperament.',
+              },
+            ].map((principle) => (
+              <div key={principle.title} className="p-6 rounded-sm bg-warm-white border border-border flex flex-col justify-between">
                 <div>
-                  <h4 className="font-heading font-bold text-lg text-navy mb-2">
-                    {item.title}
-                  </h4>
-                  <p className="text-sm text-ink-muted leading-relaxed">
-                    {item.description}
+                  <div className="w-8 h-8 rounded-sm bg-surface-blue text-academic flex items-center justify-center font-bold text-xs mb-3">
+                    <CheckCircle2 className="w-4 h-4" />
+                  </div>
+                  <h3 className="font-bold text-base text-navy mb-2">
+                    {principle.title}
+                  </h3>
+                  <p className="text-xs text-slate-dark leading-relaxed">
+                    {principle.desc}
                   </p>
                 </div>
               </div>
@@ -152,37 +188,36 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* 3. WHAT DOES YOUR CHILD NEED HELP WITH? */}
-      <section className="py-16 bg-parchment border-b border-border-subtle">
+      {/* =========================================================================
+          SECTION 3 — COMMON ACADEMIC NEEDS
+         ========================================================================= */}
+      <section className="py-16 sm:py-20 bg-warm-white border-b border-border">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading
-            badge="Personalised Support"
-            title="What does your child need help with right now?"
-            subtitle="Every student starts from a different place. Select an area to share with us in your tutor request."
+            badge="Personalised Academic Support"
+            title="What kind of support does your child need?"
+            subtitle="Every student experiences friction differently. Select an area below to align your enquiry directly with our academic team."
           />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {CHILD_NEED_CARDS.map((card) => (
               <button
                 key={card.id}
                 type="button"
                 onClick={() => handleNeedCardClick(card.helpValue)}
-                className="group text-left bg-white p-6 rounded-md border border-border-subtle hover:border-trust transition-all duration-150 shadow-xs hover:shadow-sm flex flex-col justify-between"
+                className="group text-left bg-white p-5 rounded-sm border border-border hover:border-academic transition-colors shadow-xs flex flex-col justify-between"
               >
                 <div>
-                  <div className="w-8 h-8 rounded-sm bg-trust-light group-hover:bg-trust group-hover:text-white text-trust flex items-center justify-center mb-4 transition-colors">
-                    <Sparkles className="w-4 h-4" />
-                  </div>
-                  <h3 className="font-heading font-bold text-lg text-navy mb-2 group-hover:text-trust transition-colors">
+                  <h3 className="font-bold text-base text-navy mb-2 group-hover:text-academic transition-colors">
                     {card.title}
                   </h3>
-                  <p className="text-sm text-ink-muted leading-relaxed">
+                  <p className="text-xs text-slate-dark leading-relaxed">
                     {card.description}
                   </p>
                 </div>
-                <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-trust">
-                  <span>Specify this need</span>
-                  <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
+                <div className="pt-4 mt-4 border-t border-border/60 flex items-center justify-between text-xs font-semibold text-navy">
+                  <span>Enquire for this objective</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-academic transform group-hover:translate-x-1 transition-transform" />
                 </div>
               </button>
             ))}
@@ -190,50 +225,206 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* 4. SUBJECTS */}
-      <section id="subjects" className="py-16 bg-white border-b border-border-subtle">
+      {/* =========================================================================
+          SECTION 4 — WHY INDIVIDUAL ATTENTION MATTERS
+         ========================================================================= */}
+      <section className="py-16 sm:py-20 bg-white border-b border-border">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading
-            badge="Deliberate Focus"
-            title="Focused on the subjects that matter."
-            subtitle="Rather than offering every possible subject, Spectre concentrates on the core academic disciplines for Classes 6–12."
+            badge="Tailored Instruction"
+            title="The structural advantages of one-to-one learning"
+            subtitle="How individual academic mentorship resolves the systemic shortcomings of standard batch coaching."
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {PERSONALISATION_POINTS.map((pt) => (
+              <div
+                key={pt.number}
+                className="p-6 rounded-sm bg-warm-white border border-border flex flex-col justify-between"
+              >
+                <div>
+                  <span className="font-mono text-xs font-bold text-academic uppercase tracking-widest block mb-2">
+                    {pt.number}
+                  </span>
+                  <h3 className="font-bold text-base text-navy mb-2">
+                    {pt.title}
+                  </h3>
+                  <p className="text-xs text-slate-dark leading-relaxed">
+                    {pt.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          SECTION 5 — OUR THREE PILLARS
+         ========================================================================= */}
+      <section id="services" className="py-16 sm:py-24 bg-warm-white border-b border-border">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <SectionHeading
+            badge="Institutional Structure"
+            title="Our Three Educational Services"
+            subtitle="Designed to support students from daily conceptual clarity through senior school transitions."
+          />
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {EDUCATIONAL_SERVICES.map((service) => (
+              <div
+                key={service.id}
+                className="bg-white border border-border rounded-sm p-6 sm:p-7 shadow-xs flex flex-col justify-between"
+              >
+                <div>
+                  <span className="inline-block text-[10px] font-semibold uppercase tracking-wider text-academic bg-surface-blue border border-academic/20 px-2 py-0.5 rounded-sm mb-3">
+                    {service.tag}
+                  </span>
+                  <h3 className="font-bold text-xl text-navy mb-2">
+                    {service.title}
+                  </h3>
+                  <p className="text-xs text-slate-dark font-medium mb-4">
+                    {service.lead}
+                  </p>
+                  <p className="text-xs text-slate-dark leading-relaxed mb-5">
+                    {service.description}
+                  </p>
+
+                  <div className="space-y-2 border-t border-border pt-4 mb-5">
+                    {service.features.map((feature, i) => (
+                      <div key={i} className="flex items-start gap-2 text-xs text-slate-dark">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-academic mt-0.5 shrink-0" />
+                        <span>{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {service.note && (
+                    <p className="text-[11px] text-slate italic border-l-2 border-academic/40 pl-3 py-1 mb-5">
+                      {service.note}
+                    </p>
+                  )}
+                </div>
+
+                <div className="pt-4 border-t border-border flex items-center justify-between">
+                  <Link
+                    to={service.detailLink || service.actionLink}
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-navy hover:text-academic transition-colors"
+                  >
+                    <span>Read Overview</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                  {service.isExternal ? (
+                    <a
+                      href={service.actionLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-academic hover:underline"
+                    >
+                      <span>{service.actionText}</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </a>
+                  ) : (
+                    <Link
+                      to={service.actionLink}
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-academic hover:underline"
+                    >
+                      <span>{service.actionText} →</span>
+                    </Link>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          SECTION 6 — METHODOLOGY / HOW IT WORKS
+         ========================================================================= */}
+      <section id="how-it-works" className="py-16 sm:py-20 bg-white border-b border-border scroll-mt-20">
+        <span id="our-approach" className="sr-only" aria-hidden="true" />
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <SectionHeading
+            badge="Our Methodology"
+            title="How Spectre Considers Educator Suitability"
+            subtitle="From initial intake to structured monthly reviews, every placement is human-curated."
+          />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {SPECTRE_APPROACH_STEPS.map((step) => (
+              <div
+                key={step.number}
+                className="bg-warm-white border border-border rounded-sm p-6 flex flex-col justify-between"
+              >
+                <div>
+                  <div className="w-7 h-7 rounded-sm bg-navy text-white text-xs font-bold flex items-center justify-center mb-4">
+                    {step.number}
+                  </div>
+                  <h3 className="font-bold text-base text-navy mb-2">
+                    {step.title}
+                  </h3>
+                  <p className="text-xs text-slate-dark leading-relaxed">
+                    {step.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 text-center">
+            <Button to="/request-tutor" variant="primary" size="lg">
+              Begin by Requesting an Educator
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          SECTION 7 — DELIBERATE SPECIALISATION (SUBJECTS)
+         ========================================================================= */}
+      <section id="subjects" className="py-16 sm:py-20 bg-warm-white border-b border-border scroll-mt-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <SectionHeading
+            badge="Deliberate Specialisation"
+            title="Subjects We Support"
+            subtitle="We do not attempt to be everything to everyone. We concentrate strictly on core academic disciplines across Classes 6–12 in Delhi."
           />
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {SUBJECTS_DATA.map((subject) => (
               <div
                 key={subject.name}
-                className="bg-parchment rounded-md border border-border-subtle p-7 flex flex-col justify-between"
+                className="p-6 bg-white border border-border rounded-sm shadow-xs flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-heading font-bold text-xl text-navy">
+                    <h3 className="font-bold text-xl text-navy">
                       {subject.name}
                     </h3>
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded-sm bg-navy/5 text-navy border border-navy/10">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-sm bg-surface-blue text-academic border border-academic/20">
                       {subject.tag}
                     </span>
                   </div>
-                  <p className="text-sm text-ink-muted mb-6 leading-relaxed">
+                  <p className="text-xs text-slate-dark mb-5 leading-relaxed">
                     {subject.description}
                   </p>
-
-                  <div className="space-y-2.5 pt-4 border-t border-border-subtle">
-                    {subject.topics.map((topic) => (
-                      <div key={topic} className="flex items-start gap-2 text-xs text-ink/80">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-trust mt-0.5 shrink-0" />
-                        <span>{topic}</span>
+                  <div className="space-y-1.5 border-t border-border pt-4 mb-5">
+                    {subject.topics.map((t, i) => (
+                      <div key={i} className="flex items-start gap-2 text-xs text-slate-dark">
+                        <div className="w-1.5 h-1.5 rounded-full bg-academic mt-1.5 shrink-0" />
+                        <span>{t}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="pt-6 mt-6 border-t border-border-subtle">
+                <div className="pt-4 border-t border-border">
                   <Link
-                    to="/request-tutor"
-                    className="text-xs font-semibold text-trust hover:text-trust-hover flex items-center gap-1.5"
+                    to="/private-tutoring"
+                    className="text-xs font-semibold text-navy hover:text-academic flex items-center gap-1.5 transition-colors"
                   >
-                    <span>Request a {subject.name} tutor</span>
+                    <span>View Subject Curriculum</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
@@ -243,169 +434,181 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* 5. HOW IT WORKS */}
-      <section id="how-it-works" className="py-16 bg-parchment border-b border-border-subtle">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* =========================================================================
+          SECTION 8 — INSTITUTIONAL STANDARDS (VETTING)
+         ========================================================================= */}
+      <section className="py-16 sm:py-20 bg-white border-b border-border">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading
-            badge="Simple Process"
-            title="Getting started is simple."
-            subtitle="No complex algorithms or bidding. We listen to your child’s needs and handle the coordination."
-          />
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {HOW_IT_WORKS_STEPS.map((step) => (
-              <div
-                key={step.number}
-                className="relative bg-white p-7 rounded-md border border-border-subtle flex flex-col justify-between"
-              >
-                <div>
-                  <span className="font-heading font-extrabold text-2xl text-trust tracking-tight block mb-3">
-                    {step.number}
-                  </span>
-                  <h3 className="font-heading font-bold text-lg text-navy mb-2">
-                    {step.title}
-                  </h3>
-                  <p className="text-sm text-ink-muted leading-relaxed">
-                    {step.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-12 text-center">
-            <Button to="/request-tutor" variant="primary" size="md">
-              Start with Step 1: Tell Us What Your Child Needs
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* 6. WHY SPECTRE */}
-      <section id="why-spectre" className="py-16 bg-white border-b border-border-subtle">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionHeading
-            badge="Our Philosophy"
-            title="Tutoring should feel personal."
-            subtitle="Education isn't an automated transaction. We believe students thrive when paired with thoughtful, patient educators."
+            badge="Vetting Standards"
+            title="Educator Selection Standards"
+            subtitle="Fewer than 12% of applicants are invited to represent Spectre Education. We evaluate character, clarity, and patience just as rigorously as degrees."
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {WHY_SPECTRE_PRINCIPLES.map((principle) => (
+            {EDUCATOR_STANDARDS.map((std) => (
               <div
-                key={principle.title}
-                className="p-6 rounded-md bg-parchment border border-border-subtle"
+                key={std.title}
+                className="p-6 bg-warm-white border border-border rounded-sm"
               >
-                <h3 className="font-heading font-bold text-lg text-navy mb-2 flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-trust" />
-                  <span>{principle.title}</span>
-                </h3>
-                <p className="text-sm text-ink-muted leading-relaxed pl-4">
-                  {principle.description}
+                <div className="flex items-center gap-3 mb-2.5">
+                  <div className="w-7 h-7 rounded-sm bg-navy text-white flex items-center justify-center text-xs">
+                    <UserCheck className="w-3.5 h-3.5 text-academic-light" />
+                  </div>
+                  <h3 className="font-bold text-base text-navy">
+                    {std.title}
+                  </h3>
+                </div>
+                <p className="text-xs text-slate-dark leading-relaxed">
+                  {std.description}
                 </p>
               </div>
+            ))}
+          </div>
+
+          <div className="mt-8 p-4 rounded-sm bg-surface border border-border flex items-start gap-3 text-xs text-slate-dark">
+            <ShieldCheck className="w-4 h-4 text-academic shrink-0 mt-0.5" />
+            <p>
+              <strong className="text-navy font-semibold">Institutional Safety Protocol:</strong> All educators undergo address and identity verification, academic document checks, and adhere to a strict professional code of conduct in your home.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          SECTION 9 — PARENT DIAGNOSTIC REFLECTION
+         ========================================================================= */}
+      <section className="py-16 sm:py-20 bg-warm-white border-b border-border">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <span className="inline-block text-[11px] font-semibold tracking-wider uppercase text-academic bg-surface-blue border border-academic/20 px-2.5 py-0.5 rounded-sm mb-3">
+              Diagnostic Reflection
+            </span>
+            <h2 className="font-bold text-2xl sm:text-3xl text-navy mb-3">
+              Questions to consider before choosing an educator
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-dark max-w-2xl mx-auto leading-relaxed">
+              Before inviting an educator into your home, reflecting on these diagnostic questions helps clarify your child’s actual learning needs.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {PARENT_DIAGNOSTIC_QUESTIONS.map((q, idx) => (
+              <div
+                key={idx}
+                className="p-5 bg-white border border-border rounded-sm flex items-start gap-4 shadow-xs"
+              >
+                <span className="font-mono text-xs text-academic font-bold shrink-0 mt-0.5">
+                  {`0${idx + 1}`}
+                </span>
+                <p className="text-xs sm:text-sm text-navy leading-relaxed font-medium">
+                  {q}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 p-6 bg-surface-blue border border-academic/20 rounded-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-bold text-navy">
+                Unsure which approach matches your child?
+              </p>
+              <p className="text-xs text-slate-dark mt-0.5">
+                Speak directly with our academic coordinator in Delhi for an objective conversation.
+              </p>
+            </div>
+            <a
+              href={`https://wa.me/${SITE_METADATA.coordinatorWhatsApp}?text=Hi%20Spectre%20Education!%20I%20would%20like%20to%20discuss%20my%20child's%20academic%20requirements.`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-sm bg-navy text-white text-xs font-semibold hover:bg-midnight transition-colors shrink-0 shadow-xs"
+            >
+              <MessageSquare className="w-3.5 h-3.5 text-academic-light" />
+              <span>Speak with an Advisor</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          SECTION 9.5 — PARENT PERSPECTIVES & EDITORIAL RESOURCES
+         ========================================================================= */}
+      <section className="py-16 sm:py-20 bg-white border-b border-border">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10">
+            <div>
+              <span className="inline-block px-2.5 py-0.5 rounded-sm bg-surface-blue text-academic text-[11px] font-semibold uppercase tracking-wider mb-2 border border-academic/20">
+                Academic Perspectives
+              </span>
+              <h2 className="font-bold text-2xl sm:text-3xl text-navy">
+                Guidance for Thoughtful Parents
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-dark max-w-xl mt-1 leading-relaxed">
+                Objective insights on private tutoring, study architecture, and curriculum transitions written for families in Delhi.
+              </p>
+            </div>
+            <Link
+              to="/parent-resources"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-academic hover:underline mt-4 sm:mt-0"
+            >
+              <span>View All Parent Guides</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {ARTICLES.slice(0, 3).map((article) => (
+              <article
+                key={article.slug}
+                className="p-6 bg-warm-white border border-border rounded-sm shadow-xs flex flex-col justify-between hover:border-academic transition-colors group"
+              >
+                <div>
+                  <div className="flex items-center justify-between text-xs text-slate-dark mb-3">
+                    <span className="px-2 py-0.5 rounded-sm bg-surface-blue text-academic text-[11px] font-semibold border border-academic/20">
+                      {article.category}
+                    </span>
+                    <span className="text-[11px]">{article.readTime}</span>
+                  </div>
+
+                  <h3 className="font-bold text-lg text-navy mb-2 group-hover:text-academic transition-colors leading-snug">
+                    <Link to={`/parent-resources/${article.slug}`}>
+                      {article.title}
+                    </Link>
+                  </h3>
+
+                  <p className="text-xs text-slate-dark leading-relaxed mb-6 line-clamp-3">
+                    {article.excerpt}
+                  </p>
+                </div>
+
+                <div className="pt-4 border-t border-border flex items-center justify-between">
+                  <span className="text-[11px] text-slate">
+                    {article.publishDate}
+                  </span>
+                  <Link
+                    to={`/parent-resources/${article.slug}`}
+                    className="inline-flex items-center text-xs font-semibold text-navy group-hover:text-academic transition-colors"
+                  >
+                    <span>Read Guide</span>
+                    <ArrowRight className="w-3.5 h-3.5 ml-1 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                </div>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 7. TRUST / SAFETY SECTION */}
-      <section className="py-16 bg-parchment border-b border-border-subtle">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-lg p-8 sm:p-10 border border-border-subtle shadow-xs">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-md bg-trust-light flex items-center justify-center text-trust shrink-0">
-                <ShieldCheck className="w-6 h-6" />
-              </div>
-              <div className="space-y-3">
-                <h2 className="font-heading font-bold text-2xl text-navy">
-                  Your child's learning deserves care.
-                </h2>
-                <p className="text-sm sm:text-base text-ink-muted leading-relaxed">
-                  We review tutor information before introducing tutors to families. Depending on the tutor and service requirements, this may include reviewing academic qualifications, teaching experience and conducting a phone or screening conversation.
-                </p>
-                <div className="pt-2 flex flex-wrap gap-4 text-xs text-ink font-medium">
-                  <span className="flex items-center gap-1.5">
-                    <UserCheck className="w-4 h-4 text-trust" />
-                    Academic credentials reviewed
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <Compass className="w-4 h-4 text-trust" />
-                    Delhi locality alignment
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <Clock className="w-4 h-4 text-trust" />
-                    Consistent weekly scheduling
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 8. REQUEST TUTOR CTA SECTION */}
-      <section className="py-16 bg-navy text-white text-center">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-          <h2 className="font-heading font-extrabold text-2xl sm:text-3xl text-white tracking-tight">
-            Looking for the right tutor?
-          </h2>
-          <p className="text-slate-300 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
-            Tell us a little about your child and what you’re looking for. We’ll take it from there.
-          </p>
-          <div className="pt-2">
-            <Button
-              to="/request-tutor"
-              variant="subtle"
-              size="lg"
-              className="bg-white text-navy hover:bg-slate-100 border-none font-semibold text-base"
-            >
-              Request a Tutor
-            </Button>
-          </div>
-          <p className="text-xs text-slate-400">
-            No account required &middot; For parents in Delhi &middot; Classes 6–12
-          </p>
-        </div>
-      </section>
-
-      {/* 8B. FOR TUTORS SECTION */}
-      <section id="for-tutors" className="py-16 bg-white border-b border-border-subtle">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-lg p-8 sm:p-10 border border-border-subtle bg-parchment flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div className="space-y-2 max-w-xl">
-              <span className="inline-block text-xs font-semibold tracking-wider uppercase text-trust bg-trust-light px-2.5 py-1 rounded-sm">
-                Educator Network
-              </span>
-              <h2 className="font-heading font-bold text-2xl text-navy">
-                Are you a home tutor in Delhi?
-              </h2>
-              <p className="text-sm text-ink-muted leading-relaxed">
-                Join our network to teach Mathematics, Science, or English to Classes 6–12 students. Send your subjects, preferred localities, and schedule directly to our WhatsApp coordinator.
-              </p>
-            </div>
-            <div className="shrink-0 w-full md:w-auto">
-              <Button
-                to="/request-tutor?type=tutor"
-                variant="primary"
-                size="md"
-                className="w-full md:w-auto gap-2 bg-[#25D366] hover:bg-[#20bd5a] border-[#25D366] text-white font-bold"
-              >
-                <span>Become a Tutor</span>
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 9. FAQ SECTION */}
-      <section id="faq" className="py-16 bg-parchment">
+      {/* =========================================================================
+          SECTION 10 — FAQ
+         ========================================================================= */}
+      <section id="faq" className="py-16 sm:py-20 bg-warm-white border-b border-border scroll-mt-20">
+        <span id="faqs" className="sr-only" aria-hidden="true" />
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading
             badge="Frequently Asked Questions"
-            title="Common questions from parents"
-            subtitle="Straightforward answers about our home tutoring service in Delhi."
+            title="Common Questions from Parents"
+            subtitle="Straightforward answers about our educators, home visit logistics, and matching standards in Delhi."
           />
 
           <div className="space-y-3">
@@ -413,26 +616,25 @@ export const Home: React.FC = () => {
               const isOpen = openFaqIndex === index;
               return (
                 <div
-                  key={item.question}
-                  className="bg-white rounded-md border border-border-subtle overflow-hidden transition-colors"
+                  key={index}
+                  className="border border-border rounded-sm overflow-hidden bg-white shadow-xs"
                 >
                   <button
                     type="button"
                     onClick={() => toggleFaq(index)}
-                    className="w-full text-left px-5 py-4 flex items-center justify-between gap-4 focus:outline-none"
-                    aria-expanded={isOpen}
+                    className="w-full text-left px-5 py-4 flex items-center justify-between hover:bg-surface transition-colors"
                   >
-                    <span className="font-heading font-semibold text-base text-navy">
+                    <span className="font-bold text-sm sm:text-base text-navy">
                       {item.question}
                     </span>
                     <ChevronDown
-                      className={`w-4 h-4 text-ink-muted transition-transform duration-200 shrink-0 ${
-                        isOpen ? 'transform rotate-180 text-trust' : ''
+                      className={`w-4 h-4 text-slate transition-transform duration-200 shrink-0 ml-3 ${
+                        isOpen ? 'transform rotate-180 text-academic' : ''
                       }`}
                     />
                   </button>
                   {isOpen && (
-                    <div className="px-5 pb-5 text-sm text-ink-muted leading-relaxed border-t border-slate-100 pt-3">
+                    <div className="px-5 pb-5 text-xs sm:text-sm text-slate-dark leading-relaxed border-t border-border pt-3">
                       {item.answer}
                     </div>
                   )}
@@ -442,6 +644,50 @@ export const Home: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* =========================================================================
+          SECTION 11 — FINAL INSTITUTIONAL CTA
+         ========================================================================= */}
+      <section className="py-16 sm:py-20 bg-navy text-white text-center">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+          <span className="inline-block text-[11px] font-semibold tracking-wider uppercase text-academic-light bg-white/10 px-2.5 py-0.5 rounded-sm">
+            Begin with a Considered Consultation
+          </span>
+
+          <h2 className="font-extrabold text-2xl sm:text-4xl text-white tracking-tight leading-tight">
+            Every child’s education deserves individual consideration.
+          </h2>
+
+          <p className="text-slate-300 text-xs sm:text-sm max-w-xl mx-auto leading-relaxed">
+            Tell us about your child’s grade, specific subject challenges, and learning pace. We will introduce an educator thoughtfully suited to their needs.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            <Button
+              to="/request-tutor"
+              variant="primary"
+              size="lg"
+              className="w-full sm:w-auto bg-white text-navy hover:bg-surface border-white font-bold"
+            >
+              Request an Educator
+            </Button>
+            <a
+              href={`https://wa.me/${SITE_METADATA.coordinatorWhatsApp}?text=Hi%20Spectre%20Education!%20I%20would%20like%20to%20discuss%20private%20tutoring%20for%20my%20child.`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-sm bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs"
+            >
+              <MessageSquare className="w-4 h-4" />
+              <span>WhatsApp Consultation</span>
+            </a>
+          </div>
+
+          <p className="text-[11px] text-slate-400 pt-2">
+            No long-term contracts &middot; Trial session before regular schedule &middot; Dedicated in Delhi
+          </p>
+        </div>
+      </section>
+
     </div>
   );
 };

@@ -1,16 +1,37 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, ArrowRight } from 'lucide-react';
 import { Button } from './Button';
 
+interface NavLinkItem {
+  id: string;
+  label: string;
+  href: string;
+}
+
+const navLinks: NavLinkItem[] = [
+  { id: 'hero', label: 'Home', href: '/#hero' },
+  { id: 'how-it-works', label: 'How It Works', href: '/#how-it-works' },
+  { id: 'why-spectre', label: 'Why Spectre', href: '/#why-spectre' },
+  { id: 'subjects', label: 'Subjects', href: '/#subjects' },
+  { id: 'faq', label: 'FAQs', href: '/#faq' },
+];
+
 export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>('hero');
+  const isScrollingRef = useRef(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
-  // Close mobile drawer when route changes
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [location.pathname]);
+  // Reset mobile drawer on route change during render without cascading effect passes
+  const [prevPathname, setPrevPathname] = useState(location.pathname);
+  if (prevPathname !== location.pathname) {
+    setPrevPathname(location.pathname);
+    if (mobileMenuOpen) {
+      setMobileMenuOpen(false);
+    }
+  }
 
   // Prevent body scroll when drawer is open
   useEffect(() => {
@@ -24,78 +45,157 @@ export const Navbar: React.FC = () => {
     };
   }, [mobileMenuOpen]);
 
-  const navLinks = [
-    { label: 'How It Works', href: '/#how-it-works' },
-    { label: 'Why Spectre', href: '/#why-spectre' },
-    { label: 'Subjects', href: '/#subjects' },
-    { label: 'FAQ', href: '/#faq' },
-  ];
+  // Scroll to section with sticky navbar offset
+  const scrollToSection = (id: string) => {
+    if (id === 'hero') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    const element = document.getElementById(id);
+    if (element) {
+      const navHeight = 76; // Header height offset
+      const elementPosition = element.getBoundingClientRect().top + window.scrollY;
+      const targetPosition = elementPosition - navHeight;
+      window.scrollTo({
+        top: Math.max(0, targetPosition),
+        behavior: 'smooth',
+      });
+    }
+  };
 
-  const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    if (href.startsWith('/#') && location.pathname === '/') {
-      e.preventDefault();
-      const id = href.replace('/#', '');
-      const element = document.getElementById(id);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+  // Scroll-aware IntersectionObserver for active section tracking on Home page
+  useEffect(() => {
+    if (location.pathname !== '/') {
+      return;
+    }
+
+    const sectionIds = ['hero', 'how-it-works', 'why-spectre', 'subjects', 'faq'];
+    const elements = sectionIds
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+
+    if (elements.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (isScrollingRef.current) return;
+
+        const visible = entries.filter((entry) => entry.isIntersecting);
+        if (visible.length > 0) {
+          visible.sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+          setActiveSection(visible[0].target.id);
+        }
+      },
+      {
+        rootMargin: '-76px 0px -40% 0px',
+        threshold: [0, 0.2, 0.4, 0.6, 0.8],
       }
-      setMobileMenuOpen(false);
+    );
+
+    elements.forEach((el) => observer.observe(el));
+
+    // Handle boundary edges (top & bottom of page)
+    const handleScroll = () => {
+      if (isScrollingRef.current) return;
+      if (window.scrollY < 100) {
+        setActiveSection('hero');
+      } else if (
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 60
+      ) {
+        setActiveSection('faq');
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [location.pathname]);
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    e.preventDefault();
+    setMobileMenuOpen(false);
+
+    if (location.pathname === '/') {
+      isScrollingRef.current = true;
+      setActiveSection(id);
+      scrollToSection(id);
+
+      setTimeout(() => {
+        isScrollingRef.current = false;
+      }, 850);
+    } else {
+      navigate('/#' + id);
     }
   };
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-parchment/95 backdrop-blur-sm border-b border-border-subtle">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            {/* Logo */}
-            <Link to="/" className="flex items-center space-x-3 group">
-              <div className="w-10 h-10 rounded-md bg-navy flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-[1.02]">
-                <svg className="w-5 h-5 text-trust" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-                </svg>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-heading font-bold text-lg text-navy tracking-tight leading-tight">
-                  Spectre Tutors Network
+      <header className="sticky top-0 z-40 bg-[#F7F4EC]/95 backdrop-blur-sm border-b border-[#E8E2D5] shadow-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-[72px] sm:h-20">
+            {/* Brand Identity: Emblem + Typographic Wordmark */}
+            <Link
+              to="/"
+              className="flex items-center gap-2.5 sm:gap-3 shrink-0 focus:outline-none focus:ring-2 focus:ring-academic rounded-sm py-1 transition-opacity hover:opacity-95"
+              aria-label="Spectre Education Home"
+            >
+              <img
+                src="/images/mainlogospectresvg.svg"
+                alt="Spectre Education Emblem"
+                className="h-[48px] sm:h-[54px] lg:h-[63px] w-auto object-contain shrink-0"
+              />
+              <div className="flex flex-col text-left">
+                <span className="font-extrabold text-[19px] sm:text-[20px] lg:text-[22px] text-[#1B325F] tracking-tight leading-none uppercase">
+                  SPECTRE
                 </span>
-                <span className="text-xs text-ink-muted font-medium tracking-normal">
-                  Delhi · Classes 6–12
+                <span className="font-semibold text-[8.5px] sm:text-[9px] text-[#1B325F] tracking-[2.8px] leading-tight mt-1 uppercase">
+                  EDUCATION
                 </span>
               </div>
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-8">
-              {navLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  onClick={(e) => handleScrollTo(e, link.href)}
-                  className="text-sm font-medium text-ink/80 hover:text-navy transition-colors"
-                >
-                  {link.label}
-                </a>
-              ))}
+            <nav className="hidden lg:flex items-center space-x-1.5 xl:space-x-3">
+              {navLinks.map((link) => {
+                const isActive = location.pathname === '/' && activeSection === link.id;
+                return (
+                  <a
+                    key={link.id}
+                    href={link.href}
+                    onClick={(e) => handleNavClick(e, link.id)}
+                    aria-current={isActive ? 'true' : undefined}
+                    className={`relative inline-flex items-center justify-center px-3.5 py-1.5 text-xs font-semibold tracking-wider uppercase rounded-[4px] transition-all duration-250 ease-out hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:transform-none focus:outline-none focus-visible:ring-2 focus-visible:ring-academic ${
+                      isActive
+                        ? 'bg-[#172B4D] text-[#FFF4E3] shadow-xs'
+                        : 'bg-transparent text-[#172B4D] hover:bg-[#172B4D] hover:text-[#FFF4E3]'
+                    }`}
+                  >
+                    {link.label}
+                  </a>
+                );
+              })}
             </nav>
 
             {/* Desktop CTAs */}
-            <div className="hidden md:flex items-center space-x-3">
-              <Button to="/request-tutor?type=tutor" variant="secondary" size="md">
-                Become a Tutor
+            <div className="hidden lg:flex items-center space-x-3 shrink-0">
+              <Button to="/apply-educator" variant="secondary" size="sm" className="hidden xl:inline-flex">
+                Become an Educator
               </Button>
-              <Button to="/request-tutor" variant="primary" size="md">
-                Request a Tutor
+              <Button to="/request-tutor" variant="primary" size="sm">
+                Request an Educator
               </Button>
             </div>
 
             {/* Mobile Hamburger Button */}
-            <div className="flex items-center md:hidden">
+            <div className="flex items-center lg:hidden">
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(true)}
-                className="p-2 rounded-md text-ink hover:text-navy hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-navy"
+                className="p-2 -mr-1 rounded-sm text-navy hover:bg-[#EFE8DA] focus:outline-none focus:ring-2 focus:ring-academic"
                 aria-label="Open menu"
               >
                 <Menu className="w-6 h-6" />
@@ -108,7 +208,7 @@ export const Navbar: React.FC = () => {
       {/* Mobile Slide-Out Drawer Backdrop */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs transition-opacity md:hidden"
+          className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs transition-opacity lg:hidden"
           onClick={() => setMobileMenuOpen(false)}
           aria-hidden="true"
         />
@@ -116,26 +216,37 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Slide-Out Drawer */}
       <aside
-        className={`fixed top-0 right-0 z-50 w-full max-w-xs h-full bg-parchment shadow-xl border-l border-border-subtle p-6 flex flex-col justify-between transform transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed top-0 right-0 z-50 w-full max-w-xs h-full bg-[#F7F4EC] shadow-xl border-l border-[#E8E2D5] p-6 flex flex-col justify-between transform transition-transform duration-300 ease-in-out lg:hidden overflow-y-auto ${
           mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         <div>
           {/* Drawer Header */}
-          <div className="flex items-center justify-between pb-6 border-b border-border-subtle">
-            <div className="flex items-center space-x-2.5">
-              <div className="w-8 h-8 rounded-md bg-navy flex items-center justify-center text-white">
-                <svg className="w-4 h-4 text-trust" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-                </svg>
+          <div className="flex items-center justify-between pb-5 border-b border-[#E8E2D5]">
+            <Link
+              to="/"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-2.5 shrink-0 focus:outline-none"
+              aria-label="Spectre Education Home"
+            >
+              <img
+                src="/images/mainlogospectresvg.svg"
+                alt="Spectre Education Emblem"
+                className="h-[48px] w-auto object-contain shrink-0"
+              />
+              <div className="flex flex-col text-left">
+                <span className="font-extrabold text-[19px] text-[#1B325F] tracking-tight leading-none uppercase">
+                  SPECTRE
+                </span>
+                <span className="font-semibold text-[8.5px] text-[#1B325F] tracking-[2.8px] leading-tight mt-1 uppercase">
+                  EDUCATION
+                </span>
               </div>
-              <span className="font-heading font-bold text-base text-navy">Spectre Tutors</span>
-            </div>
+            </Link>
             <button
               type="button"
               onClick={() => setMobileMenuOpen(false)}
-              className="p-1.5 rounded-md text-ink-muted hover:text-ink hover:bg-slate-100"
+              className="p-1.5 rounded-sm text-slate hover:text-navy hover:bg-[#EFE8DA]"
               aria-label="Close menu"
             >
               <X className="w-5 h-5" />
@@ -143,48 +254,49 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* Navigation Links */}
-          <nav className="mt-8 flex flex-col space-y-4">
-            <Link
-              to="/"
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-base font-medium text-ink hover:text-navy py-1.5"
-            >
-              Home
-            </Link>
-            {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                onClick={(e) => handleScrollTo(e, link.href)}
-                className="text-base font-medium text-ink hover:text-navy py-1.5"
-              >
-                {link.label}
-              </a>
-            ))}
+          <nav className="mt-6 flex flex-col space-y-2">
+            {navLinks.map((link) => {
+              const isActive = location.pathname === '/' && activeSection === link.id;
+              return (
+                <a
+                  key={link.id}
+                  href={link.href}
+                  onClick={(e) => handleNavClick(e, link.id)}
+                  aria-current={isActive ? 'true' : undefined}
+                  className={`text-sm font-semibold px-4 py-2.5 rounded-[4px] transition-all duration-250 ease-out block ${
+                    isActive
+                      ? 'bg-[#172B4D] text-[#FFF4E3]'
+                      : 'bg-transparent text-[#172B4D] hover:bg-[#172B4D] hover:text-[#FFF4E3]'
+                  }`}
+                >
+                  {link.label}
+                </a>
+              );
+            })}
           </nav>
         </div>
 
         {/* Drawer Footer CTAs */}
-        <div className="pt-6 border-t border-border-subtle flex flex-col space-y-2.5">
+        <div className="pt-6 border-t border-border flex flex-col space-y-2.5 mt-6">
           <Button
             to="/request-tutor"
             variant="primary"
             size="md"
             className="w-full flex items-center justify-center gap-2"
           >
-            <span>Request a Tutor</span>
+            <span>Request an Educator</span>
             <ArrowRight className="w-4 h-4" />
           </Button>
           <Button
-            to="/request-tutor?type=tutor"
+            to="/apply-educator"
             variant="secondary"
             size="md"
             className="w-full flex items-center justify-center gap-2"
           >
-            <span>Become a Tutor</span>
+            <span>Become an Educator</span>
           </Button>
-          <p className="text-xs text-center text-ink-muted pt-1">
-            1-on-1 Home Tuition in Delhi
+          <p className="text-[11px] text-center text-slate pt-1">
+            Private 1-on-1 Education in Delhi
           </p>
         </div>
       </aside>

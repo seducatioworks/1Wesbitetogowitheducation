@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /request-success
+
+Sitemap: https://spectreeducation.in/sitemap.xml

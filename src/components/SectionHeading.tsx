@@ -18,17 +18,17 @@ export const SectionHeading: React.FC<SectionHeadingProps> = ({
   const alignmentClasses = align === 'center' ? 'text-center mx-auto' : 'text-left';
 
   return (
-    <div className={`max-w-2xl mb-12 ${alignmentClasses} ${className}`}>
+    <div className={`max-w-3xl mb-10 sm:mb-14 ${alignmentClasses} ${className}`}>
       {badge && (
-        <span className="inline-block text-xs font-semibold tracking-wider uppercase text-trust bg-trust-light px-2.5 py-1 rounded-sm mb-3">
+        <span className="inline-block text-[11px] font-semibold tracking-wider uppercase text-academic bg-surface-blue border border-academic/20 px-2.5 py-1 rounded-sm mb-3">
           {badge}
         </span>
       )}
-      <h2 className="font-heading font-bold text-2xl sm:text-3xl text-navy tracking-tight leading-tight">
+      <h2 className="font-bold text-2xl sm:text-3xl lg:text-[34px] text-navy tracking-tight leading-[1.2]">
         {title}
       </h2>
       {subtitle && (
-        <p className="mt-3 text-base text-ink-muted leading-relaxed">
+        <p className="mt-3 text-sm sm:text-base text-slate-dark leading-relaxed">
           {subtitle}
         </p>
       )}
